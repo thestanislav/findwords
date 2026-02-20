@@ -52,28 +52,13 @@ final class EntityManager implements EntityManagerInterface
             $em = ($this->emCreatorFn)();
             $context[$key] = $em;
 
-            // Capture CID now - Co::getContext() without args may return wrong context inside defer
-            $cid = Co::getCid();
-            Co::defer(static function () use ($key, $cid) {
-                $ctx = Co::getContext($cid);
-                if ($ctx === null || ! isset($ctx[$key])) {
-                    return;
-                }
-
-                $em = $ctx[$key];
-                unset($ctx[$key]);
-
-                if (! $em instanceof EntityManagerInterface) {
-                    return;
-                }
-
-                // clear() detaches all entities, breaking circular EM↔UnitOfWork references
-                // so the PDO object inside the DBAL connection gets properly GC'd
-                try {
-                    $em->clear();
-                } catch (\Throwable) {
-                }
-
+            // Capture $em directly - avoids unreliable context re-lookup inside defer.
+            // The DBAL/PDO chain has no cycles, so close() immediately frees the MySQL
+            // connection. The EM↔UnitOfWork cycle is GC'd later but that doesn't matter
+            // since the MySQL connection is already released.
+            // NOTE: gc_collect_cycles() must NOT be called here - in Swoole it would
+            // destroy objects from other active coroutines in the same worker.
+            Co::defer(static function () use ($em) {
                 try {
                     $connection = $em->getConnection();
                     if ($connection->isConnected()) {
@@ -81,18 +66,12 @@ final class EntityManager implements EntityManagerInterface
                     }
                 } catch (\Throwable) {
                 }
-
                 try {
                     if ($em->isOpen()) {
                         $em->close();
                     }
                 } catch (\Throwable) {
                 }
-
-                unset($em);
-
-                // Force GC to collect circular references (EM↔UnitOfWork) so PDO is destroyed
-                gc_collect_cycles();
             });
         }
         return $context[$key];
