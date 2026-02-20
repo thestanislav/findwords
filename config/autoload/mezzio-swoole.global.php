@@ -7,7 +7,6 @@ declare(strict_types=1);
  * Override via SWOOLE_HOST, SWOOLE_PORT env vars (see env-overrides.php).
  */
 
-use ExprAs\Doctrine\Swoole\EntityManagerClearListener;
 use Laminas\Stdlib\ArrayUtils\MergeReplaceKey;
 use Mezzio\Swoole\Event\RequestEvent;
 use Mezzio\Swoole\Event\RequestHandlerRequestListener;
@@ -22,10 +21,8 @@ return [
     'mezzio-swoole' => [
         'enable_coroutine' => true,
         'swoole-http-server' => [
-            // RequestEvent order: clear Doctrine EM first, then view placeholders, then pipeline
             'listeners' => [
                 RequestEvent::class => new MergeReplaceKey([
-                    EntityManagerClearListener::class,
                     StaticResourceRequestListener::class,
                     RequestHandlerRequestListener::class,
                 ]),

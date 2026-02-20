@@ -51,7 +51,12 @@ final class EntityManager implements EntityManagerInterface
             $context[self::class] = ($this->emCreatorFn)();
             Co::defer(static function () use ($context) {
                 if (isset($context[self::class]) && $context[self::class] instanceof EntityManagerInterface) {
-                    $context[self::class]->close();
+                    $em = $context[self::class];
+                    $connection = $em->getConnection();
+                    if ($connection->isConnected()) {
+                        $connection->close();
+                    }
+                    $em->close();
                     unset($context[self::class]);
                 }
             });

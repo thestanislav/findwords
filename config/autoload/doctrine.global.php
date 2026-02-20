@@ -32,8 +32,6 @@ return [
                     'charset' => 'utf8mb4',
                     'driverOptions' => [
                         \PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4'",
-                        \PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-                        \PDO::ATTR_EMULATE_PREPARES => false,
                     ]
                 ]
             ],

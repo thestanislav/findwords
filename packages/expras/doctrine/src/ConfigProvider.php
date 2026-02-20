@@ -16,8 +16,6 @@ use ExprAs\Doctrine\Hydrator\DoctrineEntityFactory;
 use ExprAs\Doctrine\Repository\AbstractRepositoryFactory;
 use ExprAs\Doctrine\Repository\RepositoryFactory;
 use ExprAs\Doctrine\Service\EntityManagerInitializer;
-use ExprAs\Doctrine\Swoole\EntityManagerClearListener;
-use ExprAs\Doctrine\Swoole\EntityManagerClearListenerFactory;
 use Gedmo\Blameable\BlameableListener;
 use Gedmo\IpTraceable\IpTraceableListener;
 use Gedmo\Loggable\LoggableListener;
@@ -45,7 +43,6 @@ class ConfigProvider extends AbstractProvider
             'factories' => [
                 'doctrine.cache.default' => DefaultCacheFactory::class,
                 DoctrineEntity::class => DoctrineEntityFactory::class,
-                EntityManagerClearListener::class => EntityManagerClearListenerFactory::class,
                 'gedmo.listener.blameable' => function (ContainerInterface $container, string $requestedName): BlameableListener {
                     $listener = new BlameableListener();
 
