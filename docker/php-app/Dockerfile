@@ -66,4 +66,4 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 # mezzio-swoole HTTP server (host/port via config/autoload/mezzio-swoole.local.php)
-CMD ["php", "vendor/bin/laminas", "mezzio:swoole:start", "--num-workers=16", "--num-task-workers=0"]
+CMD ["php", "vendor/bin/laminas", "mezzio:swoole:start", "--num-workers=8", "--num-task-workers=0"]

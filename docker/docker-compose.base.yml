@@ -4,7 +4,7 @@ services:
         container_name: findwords-swoole-app
         image: ${CI_SWOOLE_APP_IMAGE:-findwords-swoole-app-dev}
         # No -d: container needs foreground process. 16 workers (2×8 cores) for high load; 0 task workers unless using Task API.
-        command: php vendor/bin/laminas mezzio:swoole:start --num-workers=16 --num-task-workers=0
+        command: php vendor/bin/laminas mezzio:swoole:start --num-workers=8 --num-task-workers=0
         restart: unless-stopped
         env_file:
             - ./../env/${CI_ENVIRONMENT_NAME:-dev}/db.env
