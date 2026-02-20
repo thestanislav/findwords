@@ -29,7 +29,8 @@ use Gedmo\Translatable\TranslatableListener;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Application;
 use ExprAs\Doctrine\Service\EventManagerFactory;
-
+use Doctrine\ORM\EntityManager as DoctrineEntityManager;
+use ExprAs\Doctrine\Container\DoctrineEntityManagerDelegator;
 class ConfigProvider extends AbstractProvider
 {
     /**
@@ -137,6 +138,9 @@ class ConfigProvider extends AbstractProvider
                 Application::class => [
                     DoctrineCommandsDelegator::class,
                 ],
+                DoctrineEntityManager::class => [
+                    DoctrineEntityManagerDelegator::class
+                ]
             ],
         ];
     }

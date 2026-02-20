@@ -1,34 +1,23 @@
 <?php
-/**
- * Author: Pavel Zarubov <zara@fu2re.ru>
- * Date: 2/20/2018
- * Time: 16:27
- */
+
+declare(strict_types=1);
 
 namespace ExprAs\Doctrine\Service;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 trait EntityManagerAwareTrait
 {
-    protected $_entityManager;
+    protected ?EntityManagerInterface $entityManager = null;
 
-    /**
-     * @return EntityManager
-     */
-    public function getEntityManager()
+    public function getEntityManager(): EntityManagerInterface
     {
-        return $this->_entityManager;
+        return $this->entityManager;
     }
 
-    /**
-     * @return $this
-     */
-    public function setEntityManager(EntityManager $entityManager)
+    public function setEntityManager(EntityManagerInterface $entityManager): static
     {
-        $this->_entityManager = $entityManager;
+        $this->entityManager = $entityManager;
         return $this;
     }
-
-
 }

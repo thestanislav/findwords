@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ExprAs\Doctrine\Swoole;
 
-use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Mezzio\Swoole\Event\RequestEvent;
 
@@ -13,8 +12,8 @@ use Mezzio\Swoole\Event\RequestEvent;
  * Runs on RequestEvent (before the middleware pipeline) so each request
  * gets a clean identity map and unit of work.
  * 
- * Also ensures the database connection is valid, closing stale connections
- * so they will be automatically reconnected on the next query.
+ * Also closes the database connection to prevent "unbuffered queries" errors
+ * when Swoole coroutines are enabled, ensuring each request gets a fresh connection.
  */
 final class EntityManagerClearListener
 {
@@ -26,24 +25,19 @@ final class EntityManagerClearListener
     public function __invoke(RequestEvent $event): void
     {
         $this->entityManager->clear();
-        $this->ensureConnectionValid();
+        $this->closeConnection();
     }
 
     /**
-     * Ensures the database connection is valid.
-     * If the connection is stale/lost, close it so Doctrine will reconnect.
+     * Closes the database connection to ensure a clean state for each request.
+     * This prevents "unbuffered queries" errors when multiple Swoole coroutines
+     * might otherwise share the same connection.
      */
-    private function ensureConnectionValid(): void
+    private function closeConnection(): void
     {
         $connection = $this->entityManager->getConnection();
         
-        if (!$connection->isConnected()) {
-            return;
-        }
-
-        try {
-            $connection->executeQuery($connection->getDatabasePlatform()->getDummySelectSQL());
-        } catch (Exception) {
+        if ($connection->isConnected()) {
             $connection->close();
         }
     }
