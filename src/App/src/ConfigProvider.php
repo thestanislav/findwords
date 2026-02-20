@@ -17,8 +17,6 @@ use App\PageCache\StorageAdapterFactory;
 use App\Service\SphinxQLConnectionFactory;
 use ExprAs\Core\ConfigAggregator\InvokableProvider;
 use ExprAs\Core\ModuleConfigProvider\AbstractProvider;
-use ExprAs\Logger\Service\LoggingErrorListenerDelegator;
-use Laminas\Stratigility\Middleware\ErrorHandler;
 
 /**
  * The configuration provider for the App module
@@ -53,11 +51,6 @@ class ConfigProvider extends AbstractProvider
                 \Foolz\SphinxQL\Drivers\Mysqli\Connection::class => SphinxQLConnectionFactory::class,
                 'page_cache_storage_adapter' => StorageAdapterFactory::class
             ],
-            'delegators'         => [
-                ErrorHandler::class => [
-                    LoggingErrorListenerDelegator::class,
-                ],
-            ],
         ];
     }
 
@@ -67,7 +60,6 @@ class ConfigProvider extends AbstractProvider
             new InvokableProvider(\ExprAs\Core\ConfigProvider::class),
             new InvokableProvider(\ExprAs\Doctrine\ConfigProvider::class),
             new InvokableProvider(\ExprAs\Asset\ConfigProvider::class),
-            //new InvokableProvider(\ExprAs\Logger\ConfigProvider::class),
             new InvokableProvider(\ExprAs\Rest\ConfigProvider::class),
             new InvokableProvider(\ExprAs\View\ConfigProvider::class),
             //new InvokableProvider(\ExprAs\Admin\ConfigProvider::class),
