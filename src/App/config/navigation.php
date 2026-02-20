@@ -62,9 +62,9 @@ return [
                             ],
                             'pages'  => [
                                 'crossword-definition' => [
-                                    'label'  => 'Crossword clues',
-                                    'route'  => 'dictionary-crossword-definition',
-                                    'action' => 'definition',
+                                    'label'         => 'Crossword clues',
+                                    'route'         => 'dictionary-crossword-definition',
+                                    'useRouteMatch' => true,
                                 ]
                             ]
                         ]

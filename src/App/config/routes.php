@@ -42,10 +42,8 @@ return [
             'path'       => '/rhyme',
             'middleware' => RhymePageHandler::class,
             'options'    => [
-                'route'    => '/rhyme',
                 'defaults' => [
-                    'controller' => 'Dictionary\Controller\Rhyme',
-                    'action'     => 'index',
+                    'action' => 'index',
                 ]
             ]
         ],
@@ -127,8 +125,7 @@ return [
             'middleware' => CrossWordPageHandler::class,
             'options'    => [
                 'defaults' => [
-                    'controller' => CrossWordPageHandler::class,
-                    'action'     => 'definition',
+                    'action' => 'definition',
                 ]
             ]
         ],
@@ -138,8 +135,7 @@ return [
             'middleware' => CrossWordPageHandler::class,
             'options'    => [
                 'defaults' => [
-                    'controller' => CrossWordPageHandler::class,
-                    'action'     => 'index',
+                    'action' => 'index',
                 ]
             ]
         ],
