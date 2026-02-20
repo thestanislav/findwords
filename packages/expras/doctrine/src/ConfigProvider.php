@@ -2,12 +2,10 @@
 
 namespace ExprAs\Doctrine;
 
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\ORM\EntityManager;
 use ExprAs\Core\ConfigAggregator\InvokableProvider;
 use ExprAs\Core\ModuleConfigProvider\AbstractProvider;
 use ExprAs\Doctrine\Behavior\Activatable\ActivatableInitializerMiddleware;
-use ExprAs\Doctrine\Behavior\Singleable\SingleableListener;
 use ExprAs\Doctrine\Console\LoadFixtures;
 use ExprAs\Doctrine\Container\DefaultCacheFactory;
 use ExprAs\Doctrine\Container\DoctrineCommandsDelegator;

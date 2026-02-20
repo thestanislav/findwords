@@ -47,21 +47,55 @@ final class EntityManager implements EntityManagerInterface
             return $this->getDefaultEm();
         }
 
-        if (! isset($context[self::class]) || ! $context[self::class] instanceof EntityManagerInterface) {
-            $context[self::class] = ($this->emCreatorFn)();
-            Co::defer(static function () use ($context) {
-                if (isset($context[self::class]) && $context[self::class] instanceof EntityManagerInterface) {
-                    $em = $context[self::class];
+        $key = self::class;
+        if (! isset($context[$key]) || ! $context[$key] instanceof EntityManagerInterface) {
+            $em = ($this->emCreatorFn)();
+            $context[$key] = $em;
+
+            // Capture CID now - Co::getContext() without args may return wrong context inside defer
+            $cid = Co::getCid();
+            Co::defer(static function () use ($key, $cid) {
+                $ctx = Co::getContext($cid);
+                if ($ctx === null || ! isset($ctx[$key])) {
+                    return;
+                }
+
+                $em = $ctx[$key];
+                unset($ctx[$key]);
+
+                if (! $em instanceof EntityManagerInterface) {
+                    return;
+                }
+
+                // clear() detaches all entities, breaking circular EM↔UnitOfWork references
+                // so the PDO object inside the DBAL connection gets properly GC'd
+                try {
+                    $em->clear();
+                } catch (\Throwable) {
+                }
+
+                try {
                     $connection = $em->getConnection();
                     if ($connection->isConnected()) {
                         $connection->close();
                     }
-                    $em->close();
-                    unset($context[self::class]);
+                } catch (\Throwable) {
                 }
+
+                try {
+                    if ($em->isOpen()) {
+                        $em->close();
+                    }
+                } catch (\Throwable) {
+                }
+
+                unset($em);
+
+                // Force GC to collect circular references (EM↔UnitOfWork) so PDO is destroyed
+                gc_collect_cycles();
             });
         }
-        return $context[self::class];
+        return $context[$key];
     }
 
     private function getDefaultEm(): EntityManagerInterface
@@ -70,6 +104,29 @@ final class EntityManager implements EntityManagerInterface
             $this->defaultEm = ($this->emCreatorFn)();
         }
         return $this->defaultEm;
+    }
+
+    /**
+     * Close the default (non-coroutine) EntityManager and its connection if it exists.
+     * Called by WorkerStopListener to clean up when worker stops.
+     */
+    public function closeDefaultConnection(): void
+    {
+        if ($this->defaultEm === null) {
+            return;
+        }
+
+        try {
+            $connection = $this->defaultEm->getConnection();
+            if ($connection->isConnected()) {
+                $connection->close();
+            }
+        } finally {
+            if ($this->defaultEm->isOpen()) {
+                $this->defaultEm->close();
+            }
+            $this->defaultEm = null;
+        }
     }
 
     /**
