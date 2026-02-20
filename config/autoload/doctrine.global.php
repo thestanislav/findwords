@@ -19,7 +19,7 @@ return [
 
         'connection' => [
             'orm_default' => [
-                'driverClass' => \Doctrine\DBAL\Driver\PDO\MySQL\Driver::class,
+                'driverClass' => \Doctrine\DBAL\Driver\Mysqli\Driver::class,
                 'params' => [
                     ...(getenv('MYSQL_SOCKET')
                         ? ['unix_socket' => getenv('MYSQL_SOCKET')]
