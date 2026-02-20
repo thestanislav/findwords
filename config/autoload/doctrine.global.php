@@ -30,9 +30,6 @@ return [
                     'password' => 'ffHe9QI87hmsHCedRhM',
                     'dbname' => 'db_findwords',
                     'charset' => 'utf8mb4',
-                    'driverOptions' => [
-                        \PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4'",
-                    ]
                 ]
             ],
         ]
