@@ -9,7 +9,7 @@ return [
         'adapter' => 'memcached',
         'options' => [
             'ttl'        => 0,
-            'namespace'  => sprintf('%u', crc32(__DIR__ . '')),
+            'namespace'  => 'findwords-swoole-app',
             'servers'    => [
                 [getenv('MEMCACHED_HOST') ?: '127.0.0.1', (int) (getenv('MEMCACHED_PORT') ?: 11211)]
             ],
