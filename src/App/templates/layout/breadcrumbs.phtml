@@ -1,0 +1,20 @@
+<?php if (isset($pages) && count($pages)): ?>
+    <ol itemprop="breadcrumb" class="breadcrumb bg-light" itemscope itemtype="https://schema.org/BreadcrumbList">
+        <?php foreach ($pages as $_k => $_page): ?>
+            <?php if ($_page->getRouter()): ?>
+                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"
+                    class="breadcrumb-item"><a itemprop="item" href="<?= $_page->getHref() ?>"><?= $_page->getLabel() ?>
+                    <meta itemprop="position" content="<?= $_k+1?>" />
+                    <meta itemprop="name" content="<?= $_page->getLabel()?>" />
+                    </a></li>
+            <?php else: ?>
+                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"
+                    class="breadcrumb-item active"><span itemprop="item"><?= $_page->getLabel() ?>
+                    <meta itemprop="position" content="<?= $_k+1?>" />
+                    <meta itemprop="name" content="<?= $_page->getLabel()?>" />
+                        </span>
+                </li>
+            <?php endif ?>
+        <?php endforeach; ?>
+    </ol>
+<?php endif; ?>

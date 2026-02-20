@@ -1,0 +1,33 @@
+# On prod server (e.g. repo at /home/thestanislav/sites/findwords):
+#   export FINDWORDS_IMAGE=ghcr.io/thestanislav/findwords:latest
+#   cd /home/thestanislav/sites/findwords && CI_ENVIRONMENT_NAME=prod make start
+# Image is built by GitHub Actions and pushed to GitHub Container Registry (ghcr.io). Watchtower pulls and restarts every 30s.
+# For private repo: on server run once: echo $GITHUB_PAT | docker login ghcr.io -u USER --password-stdin
+#
+# Unix socket: set in env/prod/app.env: SWOOLE_HOST=/run/mezzio-findwords/mezzio.sock, SWOOLE_PORT=0
+# On host: sudo mkdir -p /run/mezzio-findwords && sudo chown 1000:1000 /run/mezzio-findwords
+# Add volumes and environment below for the app, then use docker/nginx-host-unix.conf.example for nginx.
+services:
+    mezzio-swoole-app:
+        build:
+            context: ../
+            dockerfile: docker/php-app/Dockerfile
+            args:
+                APP_ENV: prod
+        volumes:
+            - /run/findwords.sock:/run/findwords.sock
+            - /var/run/sphinxsearch/searchd.sock:/run/searchd.sock
+        image: ${FINDWORDS_IMAGE:-findwords:latest}
+        healthcheck:
+            test: ["CMD-SHELL", "curl -f http://127.0.0.1:8001/api/ping || exit 1"]
+        ports:
+            - "127.0.0.1:8001:8001"
+
+    watchtower:
+        image: containrrr/watchtower:latest
+        environment:
+            DOCKER_API_VERSION: "1.44"
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        command: --interval 300 --cleanup
+        restart: unless-stopped

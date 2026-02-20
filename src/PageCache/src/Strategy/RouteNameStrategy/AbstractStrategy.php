@@ -1,0 +1,18 @@
+<?php
+declare(strict_types=1);
+
+namespace PageCache\Strategy\RouteNameStrategy;
+
+use PageCache\Strategy\AbstractStrategy as ParentAbstractStrategy;
+
+abstract class AbstractStrategy extends ParentAbstractStrategy
+{
+    protected function getNames(): array
+    {
+        $config = $this->getConfig();
+        $names = $config['names'];
+        assert(is_array($names));
+
+        return $names;
+    }
+}

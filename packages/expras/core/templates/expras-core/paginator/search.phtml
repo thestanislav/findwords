@@ -1,0 +1,40 @@
+<?php if ($pageCount > 1):
+    ?>
+        <ul class="pagination justify-content-center">
+            <!-- Previous page link -->
+
+            <?php if (isset($previous)): ?>
+                <li class="page-item">
+                    <a class="page-link" href="<?php echo $this->url($route, $routeParams, array_merge($queryParams, array('page' => $previous))); ?>">
+                        &laquo;
+                    </a></li>
+            <?php else: ?>
+                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+            <?php endif; ?>
+
+            <!-- Numbered page links -->
+            <?php foreach ($pagesInRange as $page): ?>
+                <?php if ($page != $current): ?>
+                    <li class="page-item">
+                        <a class="page-link" href="<?php echo $this->url($route, $routeParams, array_merge($queryParams, array('page' => $page)))?>">
+                            <?php echo $page; ?>
+                        </a>
+                    </li>
+                <?php else: ?>
+                    <li class="page-item active"><span class="page-link"><?php echo $page; ?></span></li>
+                <?php endif; ?>
+            <?php endforeach; ?>
+
+            <!-- Next page link -->
+            <?php if (isset($next)): ?>
+                <li class="page-item">
+                    <a class="page-link" href="<?php echo $this->url($route, $routeParams, array_merge($queryParams, array('page' => $next))); ?>">
+                        &raquo;
+                    </a>
+                </li>
+            <?php else: ?>
+                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+
+            <?php endif; ?>
+        </ul>
+<?php endif; ?>

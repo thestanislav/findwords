@@ -1,0 +1,120 @@
+<?php
+/**
+ * Author: Pavel Zarubov <zara@fu2re.ru>
+ * Date: 10/21/2017
+ * Time: 18:39
+ */
+/** @var $definitions \App\Entity\Definition[] */
+
+$this->headScript()->appendScript(
+    '{
+			"@context": "http://schema.org",
+			"@type": "WebSite",
+			"url": "' . $this->serverUrl('/') . '",
+			"potentialAction": {
+				"@type": "SearchAction",
+				"target": "' . $this->serverUrl('/')  . '/crossword?query={query}",
+				"query-input": "required name=query",
+				"description" : "Search for crossword clue answers."
+			}
+		}',
+    'application/ld+json',
+    array('noescape' => true)
+);
+
+$navigation = $this->service('DictionaryNavigation');
+$activeNavPage = $navigation->findOneBy('route', 'dictionary-crossword');
+$activeNavPage->setActive(true);
+
+?>
+    <div class="p-3 mb-4 bg-light rounded-3">
+
+        <h2>Search for crossword answers and clues</h2>
+
+        <form method="get" role="form" action="<?= $this->url('dictionary-crossword') ?>">
+            <div class="row">
+                <div class="col-sm-9">
+                    <label class="sr-only" for="term_input">Word</label>
+                    <input type="text" name="query"
+                           value="<?= $query ?>"
+                           class="form-control mb-2" id="term_input" placeholder="Enter the clue">
+                </div>
+                <div class="col-sm-2">
+                    <label class="sr-only" for="length_input">Letter count</label>
+                    <select class="form-control mb-2" name="length" id="length_input">
+                        <option value="">Letter count</option>
+                        <?php foreach (range(2, 15) as $_l):?>
+                        <option value="<?= $_l?>"><?= $_l?></option>
+                        <?php endforeach;?>
+                    </select>
+                </div>
+                <div class="col-sm-1 text-right">
+                    <button type="submit" class="btn btn-primary">Find</button>
+                </div>
+            </div>
+            <?php
+            /** @var \App\Entity\Definition[] $exampleDefinitions */
+            if (isset($exampleDefinitions) && count($exampleDefinitions)):
+                ?>
+                <p>
+                    <strong>Examples:</strong><br>
+                    <?php foreach ($exampleDefinitions as $_def):
+                        $_searchQuery = sprintf('%s - %s %s', $_def->getContent(), $_def->getWord()->getLength(), $this->plural(['letter', 'letters'],
+                            $_def->getWord()->getLength()));
+                        ?>
+
+                        <a href="<?= $this->url('dictionary-crossword', [], ['query' => rawurlencode($_searchQuery)]) ?>"><?= $_searchQuery ?></a>
+                        <br>
+                    <?php endforeach; ?>
+                </p>
+            <?php endif; ?>
+        </form>
+    </div>
+
+<?php
+    if (isset($definitions)):
+        $this->headTitle('Search results');
+    ?>
+    <div class="page-header">
+        <h1>Search results for clues containing "<?= $query ?>"</h1>
+    </div>
+    <?php if (count($definitions)): ?>
+        <section class="dict-section">
+            <ul class="styled">
+                <?php foreach (array_slice(iterator_to_array($definitions), 0, 10) as $_definition): ?>
+                    <li>
+                        <strong><?= $_definition->getMatchTerm() ?></strong>
+                        <span class="fa fa-long-arrow-alt-right"></span>
+                        <?php
+                        $length = mb_strlen($_definition->getWord()->getWord());
+                        echo $length . ' ' . $this->plural(['letter', 'letters'], $length)
+                        ?>
+                        <span class="fa fa-long-arrow-alt-right"></span>
+                        <a href="<?= $this->url('dictionary-crossword-definition', [
+                            'definition_id' => $_definition->getId()
+                        ]) ?>"><?= $_definition->getContent() ?></a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </section>
+        <?php echo $this->partial('dictionary::context-ads');?>
+        <?php if (count($definitions)>=20): ?>
+            <div class="alert alert-warning">
+                <strong>Warning</strong>
+                <p>
+                    As a result of the search shows the first 20 clues for "<?=$query?>".
+                    Please clarify your clue.
+                </p>
+            </div>
+        <?php endif; ?>
+    <?php else:?>
+        <div class="alert alert-danger">
+            <h3>Failed</h3>
+            <p>There is no results matched your search "<?=$query?>" :(</p>
+        </div>
+    <?php endif; ?>
+<?php endif; ?>
+
+<?php
+$this->headTitle('Crossword clues, answers, solver');
+?>

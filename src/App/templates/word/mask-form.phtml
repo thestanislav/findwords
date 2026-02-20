@@ -1,0 +1,148 @@
+<?php
+/**
+ * Author: Pavel Zarubov <zara@fu2re.ru>
+ * Date: 12.05.2014
+ * Time: 20:45
+ */
+$maskLength = 5;
+if (isset($mask) && mb_strlen($mask) > 0) {
+    $maskLength = mb_strlen($mask);
+} else {
+    $mask = '';
+}
+?>
+<div class="p-3 mb-4 bg-light rounded-3">
+
+
+    <?php if ($action && $action == 'starts'): ?>
+        <?php if (!isset($chars)): ?>
+            <p>Modern people have a much wider lexicon then those who lived at least half a century ago.
+                But one of the peculiarities of human memory is that we tend to forget the words we don’t use in
+                everyday speech.</p>
+
+            <p>This section will help in cases when the right word is on the tip of your tongue, you remember the first
+                letter but are not sure about the
+                following ones.
+                It is indispensable when solving crossword puzzles, if you have the initial letters of the word.</p>
+
+        <?php endif; ?>
+        <h3>Word Search by Letters</h3>
+
+        <p>You see empty boxes where you need to type the initial letters you know. You can choose any length of words
+            or specify the exact number of
+            letters in the word using the “plus” and “minus” options located at the side. The result will be a list of
+            words presented in blocks depending
+            on the number of letters. There will be simple words, abbreviated words, syntactic words and independent
+            parts of speech.
+        </p>
+    <?php elseif ($action && $action  == 'ends'): ?>
+        <?php if (!isset($chars)): ?>
+            <p>Have you ever heard the folk wisdom: “Metal is recognized by its ringing and people by their word”? It is
+                100% true.
+                A rich vocabulary, flexibility in the choice of words during the conversation and the ability to find
+                the exact lexical units indicate a
+                person’s cultural level and erudition.</p>
+            <p>When does the need to find words by final letters arise?</p>
+            <ul>
+                <li>When solving crossword puzzles.</li>
+                <li>When participating in a game like “Scrabble”.</li>
+                <li>For the selection of rhymes in the process of writing poetry.</li>
+                <li>In order to expand your vocabulary.</li>
+            </ul>
+
+
+        <?php endif; ?>
+        <h3>Word Search by Letters</h3>
+        <p>This page is designed for these purposes. In the section you will find free tools for word search in
+            accordance with this criterion. Enter the
+            letters you know in the empty boxes. Set the length of the word or leave it arbitrary. In a few seconds you
+            will get a list of words that satisfy the search request.</p>
+    <?php
+    elseif ($action && $action  == 'contains'): ?>
+        <?php if (!isset($chars)): ?>
+            <p>If you are not sure about any words, turn to this section where you can search for words containing
+                certain letters and syllables.</p>
+            <p>This section may be useful in cases when:</p>
+            <ul>
+                <li>It is necessary to recall the definition of the word. You know exactly which letters or syllables it
+                    consists of but do not remember the whole word.
+                </li>
+                <li>You need to solve a crossword puzzle using the unscrambled letters.</li>
+                <li>You are building a chain of words, sequentially replacing letters.</li>
+            </ul>
+        <?php endif; ?>
+        <h3>Word Search by Letters</h3>
+
+        <p>How to make the process of word search accurate</p>
+        <ol>
+            <li>Enter the letters you know in the order in which they are found in the word.</li>
+            <li>Select the desired word length if you have to look for words with a certain number of letters.</li>
+            <li>The system will present the right words, separated by blocks.</li>
+        </ol>
+        <p>You have the opportunity not only to learn new words on the set parameters,
+            but also to become familiar with their use in the text, which helps you remember the lexical meaning of a
+            word better.</p>
+    <?php
+    elseif ($action && $action  == 'mask'): ?>
+        <?php if (!isset($chars)): ?>
+            <p>It’s impossible to know everything. There are complex technical terms. Geographical objects sometimes
+                cause difficulties;
+                you are not supposed to study the globe carefully.</p>
+            <p>For such cases our site offers the perfect solution ‒ word search by mask. Looking for the necessary
+                concepts in this way,
+                you will not only get satisfaction from solving a crossword puzzle, but also significantly expand your
+                horizons. Erudition and awareness are of great value nowadays.</p>
+
+        <?php endif; ?>
+        <h3>Word Search by Mask</h3>
+
+        <p>How to search words by mask:</p>
+        <ol>
+            <li>Set the desired length of the word using the “plus” and “minus” options.</li>
+            <li>Enter the letters you know in the boxes. They should be arranged in the same sequence as in the word.
+            </li>
+            <li>Find the word by mask and by letters.</li>
+            <li>If the search result offers you a lot of words and you do not know which one is right for you, visit the
+                section <a href="<?= $this->url
+                (
+                    'dictionary-term'
+                ) ?>">“Meanings of Words”</a> and find out its meaning.
+            </li>
+        </ol>
+        <p>Word search with us is easy and convenient</p>
+    <?php
+    else: ?>
+        <h3>Word search containing words or syllable</h3>
+        <p>Enter the letters to search for words.</p>
+    <?php endif; ?>
+
+
+    <form class="crossword" method="get" role="form" action="<?=
+    $this->url(
+        'dictionary-contains',
+        [
+            'action' => 'mask'
+        ], [], null, ['reuse_result_params' => false]
+    ) ?>">
+        <div class="d-flex align-items-center justify-content-start flex-wrap">
+            <div class="char-actions pb-2">
+                <a title="<?= $this->translate('More letters') ?>" href="#" class="char-action-add"><i
+                            class="fa fa-plus-square"></i></a>
+                <a title="<?= $this->translate('Less letters') ?>" href="#" class="char-action-sub"><i
+                            class="fa fa-minus-square"></i></a>
+            </div>
+            <?php foreach (range(0, $maskLength - 1) as $_no): ?>
+                <div class="char-control">
+                <input type="text" value="<?= mb_substr($mask, $_no, 1) ?>" class="form-control crossword-char mb-1"
+                       placeholder="*" maxlength="1">
+                </div><?php endforeach ?>
+            <button type="submit" class="btn btn-primary ms-1">Find</button>
+        </div>
+
+        <div class="custom-control custom-checkbox ms-1">
+            <input class="custom-control-input" type="checkbox" id="fixed-checkbox" name="fuzzy"
+                   value="1" <?= ($length == 0) ? 'checked' : '' ?>>
+            <label class="custom-control-label" for="fixed-checkbox">Any word length </label>
+        </div>
+    </form>
+</div>

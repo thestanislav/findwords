@@ -1,0 +1,39 @@
+# Defaults when run without make: CI_ENVIRONMENT_NAME=dev, images from dev build
+services:
+    mezzio-swoole-app:
+        container_name: mezzio-swoole-app
+        image: ${CI_SWOOLE_APP_IMAGE:-mezzio-swoole-app-dev}
+        # No -d: container needs foreground process. 16 workers (2×8 cores) for high load; 0 task workers unless using Task API.
+        command: php vendor/bin/laminas mezzio:swoole:start --num-workers=16 --num-task-workers=0
+        restart: unless-stopped
+        env_file:
+            - ./../env/${CI_ENVIRONMENT_NAME:-dev}/db.env
+            - ./../env/${CI_ENVIRONMENT_NAME:-dev}/app.env
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        volumes:
+            # Mount host MySQL socket for connection without TCP (set MYSQL_SOCKET in db.env)
+            - "${MYSQL_SOCKET_PATH:-/var/run/mysqld/mysqld.sock}:/var/run/mysqld/mysqld.sock"
+        depends_on:
+            mezzio-memcached:
+                condition: service_started
+        healthcheck:
+            test: ["CMD-SHELL", "curl -f http://localhost:8080/api/ping || exit 1"]
+            interval: 10s
+            timeout: 5s
+            retries: 3
+            start_period: 10s
+        networks:
+            - mezzio-expras
+
+    mezzio-memcached:
+        image: memcached:1.6-alpine
+        container_name: mezzio-memcached
+        restart: unless-stopped
+        networks:
+            - mezzio-expras
+
+networks:
+    mezzio-expras:
+        name: "mezzio-expras"
+        external: true

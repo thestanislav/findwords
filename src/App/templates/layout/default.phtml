@@ -1,0 +1,71 @@
+<?php echo $this->doctype(); ?>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    <?php echo $this->headTitle('Word finder')->setSeparator(' - ')->setAutoEscape(false) ?>
+    <link rel="dns-prefetch" href="//google-analytics.com">
+    <?php
+    echo $this->plugin('HeadLink') . "\n";
+    echo $this->plugin('HeadStyle') . "\n";
+    echo $this->plugin('HeadScript') . "\n";
+    echo $this->plugin('HeadMeta') . "\n";
+    ?>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7958472158675518"
+            crossorigin="anonymous"></script>
+    <meta name="verified-code" content="f2d0e875-eeed-44a6-9067-d7dfe5544279">
+</head>
+
+<body>
+<?= $this->partial('layout::head') ?>
+
+<main class="container-xl container-fluid" id="page_wrap">
+
+    <div class="d-flex pt-3 align-items-start">
+        <div class="col-12 col-md-9">
+            <p class="d-md-none btn-sidebar-toggler">
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#sidebar">Toggle nav</button>
+            </p>
+            <?php
+            $bcContent = trim(
+                $this->navigation()->breadcrumbs()->renderPartialWithParams(
+                    ['layout' => false],
+                    'DictionaryNavigation',
+                    'layout::breadcrumbs'
+                )
+            );;
+            if (strlen($bcContent)) {
+                echo $bcContent;
+            }
+            ?>
+            <div id="ads_topbar" itemscope itemtype="http://schema.org/WPAdBlock"><ins></ins></div>
+            <?= $this->layout()->content ?>
+        </div><!--/span-->
+
+        <aside class="col-6 col-md-3 ps-md-3 sidebar-offcanvas collapse" id="sidebar" role="navigation" itemscope
+               itemtype="http://schema.org/WPSideBar">
+            <nav class="list-group" itemscope itemtype="http://schema.org/SiteNavigationElement">
+                <span class="list-group-item active">Navigation</span>
+                <a itemprop="url" href="/term" class="list-group-item">Word definitions</a>
+                <a itemprop="url" href="<?= $this->url('dictionary-crossword') ?>" class="list-group-item">Crossword
+                    solver</a>
+                <a itemprop="url" href="/rhyme" class="list-group-item">Rhyming</a>
+                <a itemprop="url" href="/anagram" class="list-group-item">Anagram solver</a>
+                <a itemprop="url" href="/anagram" class="list-group-item">Word unscrambler</a>
+                <a itemprop="url" href="/starts" class="list-group-item">Words starting with</a>
+                <a itemprop="url" href="/ends" class="list-group-item">Words ending with</a>
+                <a itemprop="url" href="/contains" class="list-group-item">Words containing letters</a>
+                <a itemprop="url" href="/mask" class="list-group-item">Words by mask</a>
+                <a itemprop="url" href="/five-letters" class="list-group-item">5-Letter Words</a>
+            </nav>
+            <div id="sky_scraper" class="text-center"></div>
+        </aside>
+
+    </div><!--/row-->
+    <!--/row-->
+</main>
+<!--/.container-->
+<?= $this->partial('layout::foot') ?>
+</body>
+</html>

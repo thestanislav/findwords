@@ -1,0 +1,49 @@
+<?php
+/**
+ * Author: Pavel Zarubov <zara@fu2re.ru>
+ * Date: 10/30/2016
+ * Time: 20:25
+ */
+
+/** @var \Mimmi20\Mezzio\Navigation\Page\Route $activeNavPage */
+/** @var \Mimmi20\Mezzio\Navigation\Navigation $navigation */
+
+$navigation = $this->service('DictionaryNavigation');
+$activeNavPage = $navigation->findOneBy('route', 'dictionary-anagram');
+$activeNavPage->setActive(true);
+$activeNavPage->setRouter($this->service(\Mezzio\Router\RouterInterface::class));
+
+$this->headMeta()->setProperty('og:type', 'article');
+
+
+$this->headTitle()->append('Решение анаграмм');
+$this->headMeta()->setProperty('og:title', 'Решение анаграмм');
+$this->headTitle()->append('Решение анаграмм');
+
+/** @var $word \App\Entity\Word */
+?>
+<div class="p-3 mb-4 bg-light rounded-3">
+    <h3>Solve Anagram / Word Unscrambler</h3>
+
+    <p>Just enter the word in the field and the system will display a block of anagrams and unscrambled words as many as
+        possible for this word.</p>
+
+    <p>The section is also useful for those who like compiling words from other words.
+        You will get a list that begins with 3 letters and ends with 8 or more letters.</p>
+
+    <form class="d-flex flex-wrap flex-sm-nowrap justify-content-start align-items-center" method="get" role="form" action="<?= $this->url('dictionary-anagram-search') ?>">
+        <label class="form-label mb-sm-0 me-sm-2" for="anagram_input">Enter letters or word</label>
+        <input type="text" name="query" value="<?= $letters??'' ?>"
+               class="form-control mb-2 mb-sm-0 me-sm-2" id="anagram_input" placeholder="Letters">
+        <button type="submit" class="btn btn-primary ms-auto">Solve</button>
+    </form>
+
+</div>
+
+<article>
+    <div class="alert alert-danger">
+        <h3>Ошибка!</h3>
+        <p>Введенной анаграмме "<?= $letters?>" имеются недопустимые символы. Пожалуйста, используйте кириллические символы.</p>
+    </div>
+</article>
+

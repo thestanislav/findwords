@@ -1,0 +1,21 @@
+{
+  "name": "expras/dom",
+  "type": "library",
+  "keywords": [
+    "library",
+    "zf2"
+  ],
+  "require": {
+    "php": ">=8.1",
+    "laminas/laminas-http": "^2.18",
+    "theseer/css2xpath": "^2.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "ExprAs\\Dom\\": "vendor/expras/dom/src"
+    }
+  },
+  "require-dev": {
+    "ext-dom": "*"
+  }
+}

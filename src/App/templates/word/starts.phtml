@@ -1,0 +1,104 @@
+<?php
+/** @var \Mimmi20\Mezzio\Navigation\Page\Route $activeNavPage */
+/** @var \Mimmi20\Mezzio\Navigation\Navigation $navigation */
+$navigation = $this->service('DictionaryNavigation');
+foreach ($navigation->findAllBy('route', 'dictionary-contains') as $_page) {
+    if (array_key_exists('action', $_page->get('params')) && $_page->get('params')['action'] == 'starts') {
+        $activeNavPage = $_page;
+        break;
+    }
+}
+$activeNavPage->setActive(true);
+$activeNavPage->setRouter($this->service(\Mezzio\Router\RouterInterface::class));
+
+/** @var $definitions \Doctrine\Common\Collections\ArrayCollection */
+/** @var $_def  \App\Entity\Definition */
+/** @var $word  \App\Entity\Word */
+
+if (isset($length) && $length > 0 && $chars) {
+    $title = sprintf('%d letter words starting with "%s"', $length, $chars);
+    $this->headMeta()->setProperty('og:title', $title);
+    $this->headTitle()->append($title);
+    $this->headTitle()->append(sprintf('Words with "%s" letters at the beginning', $chars));
+
+    $activeNavPage->addPage(
+        new \Mimmi20\Mezzio\Navigation\Page\Route([
+            'label'         => $chars,
+            'route'         => 'dictionary-contains',
+            'params'        => array('chars' => $chars),
+            'action'        => 'starts',
+            'active'        => true,
+            'pages'         => [
+                new \Mimmi20\Mezzio\Navigation\Page\Route([
+                    'label'         => sprintf('%d letter', $length),
+                    'route'         => 'dictionary-contains',
+                    'action'        => 'starts',
+                    'params'        => ['chars' => $chars, 'length' => $length],
+                    'active'        => true,
+                ])
+            ]
+        ])
+    );
+
+} elseif (isset($chars) && $chars) {
+    $title = sprintf($this->translate('words starting with "%s"'), $chars);
+    $this->headMeta()->setProperty('og:title', $title);
+    $this->headTitle()->append($title);
+    $this->headTitle()->append(sprintf('Words with "%s" letters at the beginning', $chars));
+
+    $activeNavPage->addPage(
+        new \Mimmi20\Mezzio\Navigation\Page\Route([
+            'label'         => $chars,
+            'route'         => 'dictionary-contains',
+            'params'        => array('chars' => $chars),
+            'action'        => 'starts',
+            'active'        => true,
+        ])
+    );
+
+} else {
+    $title = $this->translate('Words starting with syllable');
+    $this->headTitle()->append($title);
+    $this->headMeta()->setProperty('og:title', $title);
+}
+?>
+
+
+<?php
+echo $this->partial(
+    'word::mask-form',
+    array_merge(get_defined_vars(), [
+        'mask'     => isset($mask) ? $mask : '',
+        'length'   => isset($length) ? $length : 0,
+    ])
+);
+?>
+
+    <div class="page-header">
+        <h1><?php echo $title; ?></h1>
+    </div>
+    <article>
+        <?php
+        if (isset($terms) && $terms && $terms->count() > 0) :
+            echo $this->partial(
+                'word::list',
+                array(
+                    'terms' => $terms,
+                    'chars' => $chars
+                )
+            );
+        elseif (isset($terms)):
+            ?>
+            <div class="alert alert-danger">
+                <h3><?= $this->translate('Failure!') ?></h3>
+                <p><?= $this->translate('Unfortunately there is not word can be found.') ?></p>
+            </div>
+        <?php endif; ?>
+    </article>
+<?php
+if (isset($paginator)) {
+    echo $this->partial('dictionary::pager', [
+        'paginator' => $paginator
+    ]);
+}
+?>

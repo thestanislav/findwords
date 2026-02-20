@@ -1,0 +1,135 @@
+<?php
+
+use Monolog\Level;
+
+/**
+ * Logger Configuration Examples
+ * 
+ * This file demonstrates different logger configurations for various use cases.
+ */
+return [
+    'log' => [
+        /**
+         * Example 1: Simple File Logger
+         */
+        'app.logger' => [
+            'name' => 'app',
+            'handlers' => [
+                'stream' => [
+                    'name' => 'stream',
+                    'options' => [
+                        'stream' => 'data/logs/app.log',
+                        'level' => Level::Debug,
+                    ],
+                ],
+            ],
+            'metadata' => [
+                'description' => 'Application Logger',
+            ],
+        ],
+
+        /**
+         * Example 2: Rotating File Logger
+         * Keeps last 30 days of logs
+         */
+        'api.logger' => [
+            'name' => 'api',
+            'handlers' => [
+                'rotating_file' => [
+                    'name' => 'rotating_file',
+                    'options' => [
+                        'path' => 'data/logs/api.log',
+                        'maxFiles' => 30,
+                        'level' => Level::Info,
+                    ],
+                ],
+            ],
+            'processors' => [
+                'requestData' => [
+                    'name' => 'requestData',
+                ],
+            ],
+            'metadata' => [
+                'description' => 'API Request Logger',
+            ],
+        ],
+
+        /**
+         * Example 3: Database Logger with Custom Entity
+         */
+        'admin.request.logger' => [
+            'name' => 'admin.request',
+            'handlers' => [
+                'doctrine' => [
+                    'name' => 'doctrine',
+                    'options' => [
+                        'entity' => \Admin\Entity\AdminRequestLogEntity::class,
+                        'level' => Level::Info,
+                    ],
+                ],
+            ],
+            'processors' => [
+                'requestData' => [
+                    'name' => 'requestData',
+                ],
+            ],
+            'metadata' => [
+                'entity' => \Admin\Entity\AdminRequestLogEntity::class,
+                'description' => 'Admin API Request Logger',
+                'module' => 'ExprAs\\Admin',
+            ],
+        ],
+
+        /**
+         * Example 4: Multi-Handler Logger
+         * Logs everything to file, errors to database
+         */
+        'telegram.bot.logger' => [
+            'name' => 'telegram.bot',
+            'handlers' => [
+                // All levels to rotating file
+                'debug_file' => [
+                    'name' => 'rotating_file',
+                    'options' => [
+                        'path' => 'data/logs/telegram-bot.log',
+                        'level' => Level::Debug,
+                        'maxFiles' => 7,
+                    ],
+                ],
+                // Only errors to database
+                'error_db' => [
+                    'name' => 'doctrine',
+                    'options' => [
+                        'entity' => \Telegram\Entity\TelegramErrorLogEntity::class,
+                        'level' => Level::Error,
+                    ],
+                ],
+            ],
+            'metadata' => [
+                'description' => 'Telegram Bot Logger',
+                'module' => 'ExprAs\\Telegram',
+            ],
+        ],
+
+        /**
+         * Example 5: Syslog Logger
+         */
+        'security.logger' => [
+            'name' => 'security',
+            'handlers' => [
+                'syslog' => [
+                    'name' => 'syslog',
+                    'options' => [
+                        'ident' => 'expras-security',
+                        'facility' => LOG_AUTH,
+                        'level' => Level::Warning,
+                    ],
+                ],
+            ],
+            'metadata' => [
+                'description' => 'Security Events Logger',
+            ],
+        ],
+    ],
+];
+

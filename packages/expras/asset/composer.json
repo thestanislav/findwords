@@ -1,0 +1,12 @@
+{
+    "name": "expras/asset",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "ExprAs\\Asset\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^8.3"
+    }
+} 

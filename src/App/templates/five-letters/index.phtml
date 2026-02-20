@@ -1,0 +1,106 @@
+<?php
+$this->headTitle('5 Letter Word Puzzle & Word Game Solver');
+$this->headMeta()->appendName('description', '5 Letter Wordlet is a fun and addictive word puzzle game that can be played by people of all ages.');
+$this->headMeta()->appendName('keywords', 'Wordlet, Wordle, Duordle, Quordle');
+?>
+<div class="p-3 mb-4 bg-light rounded-3">
+
+    <h3>Solve Five Letter Word Puzzles like Wordlet, Wordle, Dordle, Quordle with Ease</h3>
+    <p>
+        Stuck on a five letter word puzzle? Look no further! We've got all the tips and tricks you need to solve Wordlet, Wordle, Dordle, and Quordle with ease.
+    </p>
+    <p>
+        First, it's important to know the basics. In Wordlet, you'll need to guess the hidden five letter word based on the letters that have been revealed.
+        Make use of common word patterns and letter combinations to improve your chances.
+    </p>
+    <p>
+        In Wordle, it's all about finding words in a grid of letters. Try starting with common five letter words and look for words that share letters with each
+        other to expand your search.
+    </p>
+    <p>
+        For Dordle and Quordle, it's all about unscrambling the letters to form a word. Use your vocabulary and knowledge of word patterns to put the letters in
+        the right order.
+    </p>
+    <p>
+        And if you're still struggling, don't worry! Our word puzzle solver is here to help. Simply enter the letters you have, and we'll give you a list of
+        possible solutions.
+    </p>
+    <p>
+        So, whether you're a seasoned word puzzle player or just starting out, we've got you covered. Get ready to solve those five letter word puzzles with
+        ease!
+
+        Enter the known letters and letters that should be excluded
+        and get a list of words, one of which may be the clue.
+    </p>
+
+    <form method="get" role="form" class="five-letters-form"
+          action="<?= $this->url('dictionary-five-letters') ?>">
+        <div class="d-flex justify-content-start align-items-center flex-wrap flex-sm-nowrap mb-2">
+            <label class="col-sm-4 me-sm-2 mb-sm-0 form-label d-none d-sm-block" for="known_input">Enter known letters</label>
+            <input type="text" name="known" value="<?= $known ?? '' ?>" required
+                   class="form-control me-sm-2 mb-2 mb-sm-0" id="known_input" placeholder="Known letters">
+        </div>
+
+        <div class="d-flex justify-content-start align-items-center flex-wrap flex-sm-nowrap mb-2">
+            <label class="col-sm-4 me-sm-2 mb-sm-0 form-label d-none d-sm-block" for="exclude_input">Enter the letters to exclude</label>
+            <input type="text" name="exclude" value="<?= $exclude ?? '' ?>" required
+                   class="form-control me-sm-2 mb-2 mb-sm-0" id="exclude_input" placeholder="Letters to exclude">
+        </div>
+
+        <div class="d-flex justify-content-start align-items-center flex-wrap flex-sm-nowrap mb-2">
+            <label class="col-sm-4 me-sm-2 mb-sm-0 form-label mask-label">Word mask</label>
+            <?php foreach (range(0, 4) as $_no): ?>
+                <div class="char-control">
+                <input type="text" value="<?= mb_substr($mask, $_no, 1) ?>"
+                       class="form-control me-2" placeholder="*" maxlength="1">
+                </div><?php endforeach ?>
+        </div>
+        <button type="submit" class="btn btn-primary ms-auto">Solve</button>
+    </form>
+
+</div>
+
+<?php if (isset($terms)): ?>
+    <?php
+    $this->headTitle()->prepend(sprintf('Search results for words by mask %s containing letters %s', $mask, $known));
+    ?>
+    <h1>Search results for word mask "<?= $mask ?>"
+        <?php if (mb_strlen($known)): ?>
+            including "<?= $known ?>"
+        <?php endif; ?>
+        <?php if (mb_strlen($exclude)): ?>
+            and excluding "<?= $exclude ?>" letters
+        <?php endif; ?>
+    </h1>
+    <?php if ($terms->count()): ?>
+        <section class="dict-section">
+            <div class="dict-definition words-list">
+                <?php while ($terms->valid()):
+                    $_term = $terms->current();
+                    ?>
+                    <a href="<?=
+                    $this->url(
+                        'dictionary-term',
+                        [
+                            'term' => rawurlencode($_term->getWord())
+                        ]
+                    ) ?>"><?= $_term->getWord() ?></a>
+                    <?php
+                    $terms->next();
+                endwhile;
+                ?>
+            </div>
+        </section>
+
+    <?php else:; ?>
+        <div class="alert alert-danger">
+            <h3>Failure</h3>
+
+            <p>Unfortunately, no words were found for the entered data.</p>
+        </div>
+    <?php endif; ?>
+<?php endif; ?>
+<?php
+$this->headMeta()->setProperty('og:title', 'Wordlet, Wordle, Duordle, Quordle puzzle solver');
+
+?>

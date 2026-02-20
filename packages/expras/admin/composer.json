@@ -1,0 +1,12 @@
+{
+    "name": "expras/admin",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "ExprAs\\Admin\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^8.3"
+    }
+} 

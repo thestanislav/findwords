@@ -1,0 +1,25 @@
+
+<?php
+while ($rhymes->valid()):
+    $_term = $rhymes->current();
+    ?>
+    <section class="dict-section">
+        <h4><?=$blockTitle?></h4>
+        <div class="dict-definition words-list">
+            <?php while ($rhymes->valid()):
+                $_term = $rhymes->current();
+                ?>
+                <a href="<?=
+                $this->url(
+                    'dictionary-term',
+                    array(
+                        'term' => rawurlencode($_term->getWord())
+                    )
+                )?>"><?= $_term->getWord() ?></a>
+                <?php
+                $rhymes->next();
+            endwhile;
+            ?>
+        </div>
+    </section>
+<?php endwhile; ?>

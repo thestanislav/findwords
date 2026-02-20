@@ -1,0 +1,9 @@
+{
+    "name": "expras/doctrine",
+    "type": "library",
+    "autoload": {"psr-4": {"ExprAs\\Doctrine\\": "src/"}},
+    "require": {"php": "^8.3", "doctrine/orm": "^2.0"},
+    "suggest": {
+        "mezzio/mezzio-swoole": "For EntityManagerClearListener on Swoole RequestEvent"
+    }
+}

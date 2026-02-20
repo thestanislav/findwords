@@ -1,0 +1,73 @@
+<?php
+
+use ExprAs\Logger\Entity\ErrorLogEntity;
+use Monolog\Level;
+
+/**
+ * Logger Configuration Example
+ * 
+ * This file shows various logger configuration options.
+ * Copy to logger.php and customize as needed.
+ */
+return [
+    'log' => [
+        /**
+         * ExprAs Framework Logger - Database Example
+         */
+        'expras_logger' => [
+            'name' => 'expras_logger',
+            'handlers' => [
+                // Error-specific Doctrine handler - logs to database
+                'error_doctrine' => [
+                    'name' => 'custom',
+                    'options' => [
+                        'service' => \ExprAs\Logger\LogHandler\ErrorDoctrineHandler::class,
+                    ],
+                ],
+                // Also log critical errors to file
+                'critical_file' => [
+                    'name' => 'stream',
+                    'options' => [
+                        'stream' => 'data/logs/critical.log',
+                        'level' => Level::Critical,
+                    ],
+                ],
+            ],
+            'processors' => [
+                'requestData' => [
+                    'name' => 'requestData',
+                    'priority' => -1
+                ],
+            ],
+            'metadata' => [
+                'entity' => ErrorLogEntity::class,
+                'description' => 'ExprAs Framework Error Logger',
+                'module' => 'ExprAs\\Logger',
+            ],
+        ],
+
+        /**
+         * Example: Module-specific Logger
+         * 
+         * Shows how a module can define its own logger.
+         * Uncomment and customize for your module.
+         */
+        // 'mymodule.logger' => [
+        //     'name' => 'mymodule',
+        //     'handlers' => [
+        //         'rotating_file' => [
+        //             'name' => 'rotating_file',
+        //             'options' => [
+        //                 'path' => 'data/logs/mymodule.log',
+        //                 'maxFiles' => 30,
+        //                 'level' => Level::Info,
+        //             ],
+        //         ],
+        //     ],
+        //     'metadata' => [
+        //         'description' => 'My Module Logger',
+        //         'module' => 'MyModule',
+        //     ],
+        // ],
+    ],
+];

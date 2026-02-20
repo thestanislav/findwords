@@ -1,0 +1,9 @@
+{
+    "name": "expras/core",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "ExprAs\\Core\\": "src/"
+        }
+    }
+}

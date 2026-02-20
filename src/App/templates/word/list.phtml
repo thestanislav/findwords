@@ -1,0 +1,92 @@
+<?php
+/** @var $terms \Doctrine\Common\Collections\ArrayCollection */
+/** @var $_term  \App\Entity\Word */
+?>
+
+
+<?php
+$maskMode = isset($maskMode) && $maskMode;
+$lastLength = 0;
+$rhymes = $terms;
+$counter = 0;
+
+while ($rhymes->valid()):
+    $_term = $rhymes->current();
+    ?>
+    <section class="dict-section">
+        <?php if (!isset($length)): ?>
+            <h4> <?= $_term->getLength() ?> letter words
+                <a href="<?php
+                if ($maskMode) {
+                    echo $this->url(
+                        'dictionary-contains',
+                        array(
+                            'length' => $_term->getLength(),
+                            'chars'  => rawurlencode( mb_substr($mask . str_repeat('*', 32), 0, $_term->getLength()))
+                        ),
+                    );
+                } else {
+                    echo $this->url(
+                        'dictionary-contains',
+                        array(
+                            'length' => $_term->getLength()
+                        ),
+                    );
+                }
+                ?>"><i class="fa fa-external-link-square"></i>
+                    <span class="sr-only">See all <?= $_term->getLength() ?> letter words</span></a></h4>
+        <?php endif; ?>
+        <div class="dict-definition words-list">
+            <?php $this->placeholder('definition')->captureStart('SET'); ?>
+            <?php
+            $words = array();
+            while ($rhymes->valid()):
+                $_term = $rhymes->current();
+                $words[] = $_term;
+                ?>
+                <?php if ($_term->getDefinitionCount() > 0 || $_term->getUsageExampleCount() > 0): ?>
+                <a href="<?=
+                $this->url(
+                    'dictionary-term',
+                    array(
+                        'term' => rawurlencode($_term->getWord())
+                    )
+                ) ?>"><?= $_term->getWord() ?></a>
+                <?php else: ?>
+                <span><?= $_term->getWord() ?></span>
+            <?php endif; ?>
+                <?php
+                $rhymes->next();
+                if ($rhymes->valid() && $_term->getLength() != $rhymes->current()->getLength()) {
+                    break;
+                }
+                $lastLength = $_term->getLength();
+                ?>
+            <?php endwhile; ?>
+            <?php
+            $this->placeholder('definition')->captureEnd();
+            echo $this->HilightSyllables((string)$this->placeholder('definition'), $chars, 'span', array('class' => 'text-danger'));
+            ?>
+        </div>
+        <?php
+        if ((++$counter) == 1 || $counter % 4 == 0) {
+            echo $this->partial('dictionary::context-ads');
+        } ?>
+    </section>
+
+    <?php
+    if (isset($length)) {
+        echo $this->partial(
+            'word::examples',
+            array(
+                'title' => 'Word usage examples',
+                'words' => array_reverse($words),
+                'match' => $chars,
+                'limit' => 10
+            )
+        );
+    }
+
+    ?>
+
+<?php endwhile; ?>

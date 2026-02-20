@@ -1,0 +1,110 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'nutgram' => [
+        // Bot token from @BotFather (required)
+        // Example: 123456789:ABCdefGHIjklMNOpqrsTUVwxyz
+        'token' => '',
+
+        // Bot configuration
+        'config' => [
+            // API URL (optional, default: https://api.telegram.org)
+            'api_url' => 'https://api.telegram.org',
+
+            // Bot ID (optional)
+            'bot_id' => null,
+
+            // Bot name (optional)
+            'bot_name' => null,
+
+            // Test environment (optional, default: false)
+            'test_env' => false,
+
+            // Local environment (optional, default: false)
+            'is_local' => false,
+
+            // Client timeout (optional, default: 5)
+            'timeout' => 5,
+
+            // Client options (optional)
+            'client' => [],
+
+            // Hydrator class (optional, default: NutgramHydrator)
+            'hydrator' => \SergiX44\Nutgram\Hydrator\NutgramHydrator::class,
+
+            // Local path transformer (optional)
+            'local_path_transformer' => null,
+
+            // Enable HTTP/2 (optional, default: true)
+            'enable_http2' => true,
+
+            // Conversation TTL (optional, default: 43200)
+            'conversation_ttl' => 43200,
+        ],
+
+        // Authentication configuration
+        'auth' => [
+            // Token time-to-live in seconds (default: 900 = 15 minutes)
+            'token_ttl' => 900,
+
+            // Bot username from @BotFather (required for deep links)
+            // Example: 'your_bot_username'
+            'bot_username' => '',
+        ],
+
+        // Webhook configuration
+        'webhook' => [
+            // Webhook URL (required)
+            'url' => 'https://example.com/ng/wh/update',
+
+            // IP address (optional)
+            'ip_address' => null,
+
+            // Max connections (optional, default: 40)
+            'max_connections' => 40,
+
+            // Drop pending updates (optional, default: false)
+            'drop_pending_updates' => false,
+
+            // Secret token (optional)
+            'secret_token' => null,
+
+            // Allowed updates (optional)
+            'allowed_updates' => [
+                'message',
+                'edited_message',
+                'channel_post',
+                'edited_channel_post',
+                'inline_query',
+                'chosen_inline_result',
+                'callback_query',
+                'shipping_query',
+                'pre_checkout_query',
+                'poll',
+                'poll_answer',
+                'my_chat_member',
+                'chat_member',
+                'chat_join_request',
+            ],
+        ],
+
+        // Safe mode (optional, default: false)
+        'safe_mode' => false,
+
+        // Enable mixins (optional, default: false)
+        'mixins' => false,
+
+        // Handlers configuration
+        'handlers_path' => getcwd() . '/src/Bot/src/Handler',
+        'handlers_namespace' => 'Bot\\Handler',
+
+        // Bot commands to register
+        'commands' => [
+            '/start',
+            '/help',
+            // Add your commands here
+        ],
+    ],
+];

@@ -1,0 +1,58 @@
+<?php
+
+/** @var $terms \Doctrine\Common\Collections\ArrayCollection */
+/** @var $_term  \App\Entity\Word */
+?>
+
+
+<?php
+$lastLength = 0;
+$it = $terms;
+$counter = 0;
+while ($it->valid()):
+    $_term = $it->current();
+    ?>
+    <section class="dict-section">
+        <?php if (!isset($length)): ?>
+            <h4><?= $_term->getLength() ?> letter words
+                <?php if (isset($letters) && $letters): ?>
+                    <a href="<?=
+                    $this->url(
+                        'dictionary-anagram-term',
+                        array(
+                            'length' => $_term->getLength()
+                        )
+                    ) ?>"><i class="fa fa-external-link-square"></i>
+                        <span class="sr-only">All <?= $_term->getLength() ?> letter anagrams</span></a>
+                <?php endif; ?>
+            </h4>
+        <?php endif; ?>
+        <div class="dict-definition words-list">
+            <?php while ($it->valid()):
+                $_term = $it->current();
+                ?>
+                <?php if ($_term->getDefinitionCount() > 0 || $_term->getUsageExampleCount() > 0): ?>
+                <a href="<?=
+                $this->url(
+                    'dictionary-term',
+                    array(
+                        'term' => $_term->getWord()
+                    )
+                ) ?>"><?= $_term->getWord() ?></a>
+            <?php else: ?>
+                <span><?= $_term->getWord() ?></span>
+            <?php endif; ?>
+                <?php
+                $it->next();
+                if ($it->valid() && $_term->getLength() != $it->current()->getLength()) {
+                    break;
+                }
+                $lastLength = $_term->getLength();
+                ?>
+            <?php endwhile; ?>
+        </div>
+        <?php if ((++$counter) == 1 || $counter % 4 == 0) {
+            echo $this->partial('dictionary::context-ads');
+        } ?>
+    </section>
+<?php endwhile; ?>

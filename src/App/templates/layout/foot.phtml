@@ -1,0 +1,17 @@
+<?php
+/**
+ * Author: Pavel Zarubov <zara@fu2re.ru>
+ * Date: 13.04.2014
+ * Time: 21:05
+ */
+?>
+<footer id="footer" itemscope itemtype="http://schema.org/WPFooter">
+    <div class="container">
+        <?=$this->partial('dictionary::social-network-share')?>
+        <hr>
+        <p>&copy; <a href="/">Word finder</a> <?= (new \IntlDateFormatter(null, \IntlDateFormatter::NONE, \IntlDateFormatter::NONE, null, null, 'y'))->format(new \DateTimeImmutable()) ?></p>
+    </div>
+</footer>
+<?php echo $this->inlineScript() ?>
+
+

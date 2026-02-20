@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'nutgram' => [
+        // Bot token from @BotFather (required)
+        // Get your token from https://t.me/BotFather
+        'token' => '123456789:ABCdefGHIjklMNOpqrsTUVwxyz',
+
+        // Bot configuration
+        'config' => [
+            // Test environment (optional, default: false)
+            'test_env' => true,
+
+            // Local environment (optional, default: false)
+            'is_local' => true,
+        ],
+
+        // Webhook configuration
+        'webhook' => [
+            // Webhook URL (required)
+            'url' => 'https://example.test/ng/wh/update',
+
+            // Drop pending updates (optional, default: false)
+            'drop_pending_updates' => true,
+        ],
+
+        // Safe mode (optional, default: false)
+        'safe_mode' => true,
+
+        // Enable mixins (optional, default: false)
+        'mixins' => true,
+    ],
+];

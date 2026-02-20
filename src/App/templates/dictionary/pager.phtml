@@ -1,0 +1,36 @@
+<?php
+/**
+ * Author: Pavel Zarubov <zara@fu2re.ru>
+ * Date: 1/10/2018
+ * Time: 14:27
+ */
+?>
+
+<?php if (isset($paginator) && ($paginator['hasPreviousPage'] || $paginator['hasNextPage'])):
+    if ($paginator['currentPage'] > 1) {
+        $this->headTitle()->append('Page ' . $paginator['currentPage']);
+    }
+
+    ?>
+    <nav class="term-paginator d-flex justify-content-between">
+        <a class="btn btn-secondary<?= ($paginator['hasPreviousPage'] ? '' : ' disabled') ?>" href="<?php
+        if ($paginator['hasPreviousPage']) {
+            echo $this->url(null, [], ['page' => $paginator['currentPage'] - 1]);
+        } else {
+            echo '#';
+        }
+        ?>"><span class="fas fa-long-arrow-alt-left" aria-hidden="true"></span> Previous</a>
+
+        <a class="btn btn-secondary<?= ($paginator['hasNextPage'] ? '' : ' disabled') ?>" href="<?php
+        if ($paginator['hasNextPage']) {
+            echo $this->url(
+                null,
+                [],
+                ['page' => $paginator['currentPage'] + 1]
+            );
+        } else {
+            echo '#';
+        }
+        ?>">Next <span aria-hidden="true" class="fas fa-long-arrow-alt-right"></span></a>
+    </nav>
+<?php endif ?>

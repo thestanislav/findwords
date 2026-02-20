@@ -1,0 +1,12 @@
+{
+    "name": "expras/helpers",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "ExprAs\\Helpers\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^8.3"
+    }
+} 

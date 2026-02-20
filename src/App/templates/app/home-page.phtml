@@ -1,0 +1,314 @@
+<?php
+$this->headTitle()->prepend('Rhyming');
+$this->headTitle()->prepend('Solving anagrams');
+$this->headTitle()->prepend('Search words by mask');
+/** @var $randomWords \ArrayIterator */
+?>
+
+<div class="p-3 mb-4 bg-light rounded-3">
+
+    <h1>Welcome to the Word Finder</h1>
+
+    <p> Are you one of those people who prefer intellectual puzzles to video games?
+        If it is so, the site <a href="/">Word Finder is</a> the right place for you as it has been designed for
+        creative people who appreciate the word and do
+        not afford mangling words or using them in a completely different meaning.
+        The problem is that one can find it difficult to perform various manipulations with words,
+        make word-shifters and define the lexical meaning of a word. Now you have an excellent online assistant that
+        will solve the problem.</p>
+
+    <p>Schoolchildren, students of philology, foreigners and just people who like word games,
+        <a href="<?= $this->url('dictionary-contains', array('action' => 'mask')) ?>">solving crossword puzzles</a>
+        and
+        <a href="<?= $this->url('dictionary-contains', array('action' => 'mask')) ?>">word search by letters</a>
+        will find this site useful.</p>
+
+    <p>Word Finder includes several sections and each of them helps solve a separate problem, namely:</p>
+    <ul>
+        <li>Word Search by Letters and Syllables</li>
+        <li>Word Search by Initial Letters</li>
+        <li>Word Search by Last Letters</li>
+        <li>Word Search by Letters</li>
+        <li>Rhyme Search</li>
+        <li>Anagram Solver</li>
+        <li>Unscramble words</li>
+        <li>Words Definition Search</li>
+    </ul>
+    <p>Click on word search and solve the problems.</p>
+
+    <p>You will be pleased with easy navigation and simple and clear interface.</p>
+</div>
+<div class="ads-block-horizontal"></div>
+<div class="row main-search-blocks">
+    <div class="col-md-6 mb-3">
+        <div class="card border-primary mb-3">
+            <div class="card-header bg-primary text-white">Search words containing letters</div>
+            <div class="card-body">
+                <form method="get" role="form" action="<?=
+                $this->url(
+                    'dictionary-contains',
+                    array(
+                        'action' => 'mask'
+                    )
+                ) ?>">
+                    <div class="row align-items-center mb-3">
+                        <label class="col-sm-3 form-label" for="">Mask:</label>
+
+                        <div class="col-sm-9">
+                            <input type="text"
+                                   class="form-control" name="query" placeholder="***c*****">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mb-3">
+                        <button type="submit" class="btn btn-primary">Find</button>
+                    </div>
+
+                    Examples:
+                    <?php
+                    $cnter = 0;
+                    while ($randomWords->valid() && $cnter < 5):
+                        $_term = $randomWords->current();
+                        $word = $_term->getWord();
+                        if (!preg_match('~^[\w\-\.\_%\*]+$~', $word)) {
+                            $randomWords->next();
+                            continue;
+                        }
+                        foreach (range(1, mb_strlen($word) / 2) as $_no) {
+                            $word = str_replace(mb_substr($word, $_no, 1), '*', $word);
+                        }
+                        ?>
+                        <a href="<?=
+                    $this->url(
+                        'dictionary-contains',
+                        array(
+                            'action' => 'mask',
+                            'chars'  => $word
+                        )
+                    ) ?>"><?= $word; ?></a><?= ($cnter < 4 ? ', ' : '') ?>
+                        <?php
+                        $cnter++;
+                        $randomWords->next();
+                    endwhile ?>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card border-secondary">
+            <div class="card-header bg-secondary text-white">Search words starting with letter</div>
+            <div class="card-body">
+                <form method="get" role="form" action="<?=
+                $this->url(
+                    'dictionary-contains',
+                    array(
+                        'action' => 'starts'
+                    )
+                ) ?>">
+                    <div class="row align-items-center mb-3">
+                        <label class="col-sm-3 form-label" for="">Letters:</label>
+
+                        <div class="col-sm-9">
+                            <input type="text"
+                                   class="form-control" name="query" placeholder="ex. fo">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mb-3">
+                        <button type="submit" class="btn btn-primary">Find</button>
+                    </div>
+                    Examples:
+                    <?php
+                    $cnter = 0;
+                    while ($randomWords->valid() && $cnter < 5):
+                        $_term = $randomWords->current();
+                        $chars = mb_substr($_term->getWord(), 0, rand(1, 3));
+                        ?>
+                        <a href="<?=
+                    $this->url(
+                        'dictionary-contains',
+                        array(
+                            'action' => 'starts',
+                            'chars'  => $chars
+                        )
+                    ) ?>"><?= $chars; ?>*</a><?= ($cnter < 4 ? ', ' : '') ?>
+                        <?php
+                        $cnter++;
+                        $randomWords->next();
+                    endwhile ?>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card bg-light">
+            <div class="card-header">Search words ending with letter</div>
+            <div class="card-body">
+                <form method="get" role="form" action="<?=
+                $this->url(
+                    'dictionary-contains',
+                    array(
+                        'action' => 'ends'
+                    )
+                ) ?>">
+                    <div class="row align-items-center mb-3">
+                        <label class="col-sm-3 form-label" for="">Letters:</label>
+                        <div class="col-sm-9">
+                            <input type="text"
+                                   class="form-control" name="query" placeholder="ex. er">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mb-3">
+                        <button type="submit" class="btn btn-primary">Find</button>
+                    </div>
+                    Examples:
+                    <?php
+                    $cnter = 0;
+                    while ($randomWords->valid() && $cnter < 5):
+                        $_term = $randomWords->current();
+                        $chars = mb_substr($_term->getWord(), rand(1, 3) * -1);
+                        ?>
+                    <a href="<?=
+                    $this->url(
+                        'dictionary-contains',
+                        array(
+                            'action' => 'ends',
+                            'chars'  => preg_replace('/[^\w\-\.\_%\*]/', '', $chars)
+                        )
+                    ) ?>">*<?= $chars; ?></a><?= ($cnter < 4 ? ', ' : '') ?>
+                        <?php
+                        $cnter++;
+                        $randomWords->next();
+                    endwhile ?>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">Search words containing letter</div>
+            <div class="card-body">
+                <form method="get" role="form" action="<?=
+                $this->url(
+                    'dictionary-contains',
+                    array(
+                        'action' => 'contains'
+                    )
+                ) ?>">
+                    <div class="row align-items-center mb-3">
+                        <label class="col-sm-3 form-label" for="">Letters:</label>
+
+                        <div class="col-sm-9">
+                            <input type="text"
+                                   class="form-control" name="query" placeholder="ex. on">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mb-3">
+                        <button type="submit" class="btn btn-primary">Find</button>
+                    </div>
+                    Examples:
+                    <?php
+                    $cnter = 0;
+                    while ($randomWords->valid() && $cnter < 5):
+                        $_term = $randomWords->current();
+                        $chars = mb_substr($_term->getWord(), rand(1, 3), rand(1, 3));
+                        ?>
+                    <a href="<?=
+                    $this->url(
+                        'dictionary-contains',
+                        array(
+                            'action' => 'contains',
+                            'chars'  => $chars
+                        )
+                    ) ?>">*<?= $chars; ?>*</a><?= ($cnter < 4 ? ', ' : '') ?>
+                        <?php
+                        $cnter++;
+                        $randomWords->next();
+                    endwhile ?>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-white">Find rhymes</div>
+            <div class="card-body">
+                <form method="get" role="form" action="<?=
+                $this->url(
+                    'dictionary-rhyme-search'
+                ) ?>">
+                    <div class="row align-items-center mb-3">
+                        <label class="col-sm-3 form-label" for="">Word:</label>
+
+                        <div class="col-sm-9">
+                            <input type="text"
+                                   class="form-control" name="query" placeholder="ex. forex">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mb-3">
+                        <button type="submit" class="btn btn-primary">Find</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">Anagram solver</div>
+            <div class="card-body">
+                <form method="get" role="form" action="<?=
+                $this->url(
+                    'dictionary-anagram-search'
+                ) ?>">
+                    <div class="row align-items-center mb-3">
+                        <label class="col-sm-3 form-label" for="">Word:</label>
+
+                        <div class="col-sm-9">
+                            <input type="text"
+                                   class="form-control" name="query" placeholder="ex. rebase">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mb-3">
+                        <button type="submit" class="btn btn-primary">Find</button>
+                    </div>
+                    Examples:
+                    <a href="<?= $this->url('dictionary-anagram-term', array('term' => 'kanb')) ?>">kanb</a>,
+                    <a href="<?= $this->url('dictionary-anagram-term', array('term' => 'ditcer')) ?>">ditcer</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card bg-light">
+            <div class="card-header">Find word definitions</div>
+            <div class="card-body">
+                <form method="get" role="form" action="<?=
+                $this->url(
+                    'dictionary-search'
+                ) ?>">
+                    <div class="row align-items-center mb-3">
+                        <label class="col-sm-3 form-label" for="">Word:</label>
+
+                        <div class="col-sm-9">
+                            <input type="text"
+                                   class="form-control" name="query" placeholder="ex. credit">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mb-3">
+                        <button type="submit" class="btn btn-primary">Find</button>
+                    </div>
+                    Examples: <a href="<?= $this->url('dictionary-term', array('term' => 'credit')) ?>">credit</a>
+                    <a href="<?= $this->url('dictionary-term', array('term' => 'bank')) ?>">bank</a>
+                    <a href="<?= $this->url('dictionary-term', array('term' => 'insurance')) ?>">insurance</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="ads-block-horizontal"></div>

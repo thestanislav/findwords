@@ -1,0 +1,17 @@
+services:
+    mezzio-swoole-app:
+        build:
+            context: ../
+            dockerfile: docker/php-app/Dockerfile
+            args:
+                APP_ENV: dev
+        volumes:
+            - ../config:/opt/app/config:ro
+            - ../src:/opt/app/src:ro
+            - ../public:/opt/app/public:ro
+        ports:
+            - "127.0.0.1:8080:8080"
+
+networks:
+    mezzio-expras:
+        external: false

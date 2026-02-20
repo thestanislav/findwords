@@ -1,0 +1,23 @@
+<header class="navbar navbar-expand-md fixed-top navbar-dark bg-primary">
+    <nav class="container-fluid container-lg" itemscope itemtype="http://schema.org/WPHeader">
+        <a class="navbar-brand" href="/" itemprop="headline">Word finder</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-head">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar-head">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0" itemscope itemtype="http://schema.org/SiteNavigationElement">
+                <li class="nav-item">
+                    <a class="nav-link" itemprop="url" href="<?= $this->url('dictionary-rhyme') ?>">Rhyming</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" itemprop="url" href="<?= $this->url('dictionary-anagram') ?>">Anagrams</a>
+                </li>
+            </ul>
+            <form class="d-flex my-2 my-lg-0" method="get" role="form" action="<?= $this->url('dictionary-crossword') ?>">
+                <input name="query" class="form-control me-2" type="text" placeholder="Search for crossword clues" aria-label="crossword clue">
+                <button class="btn btn-outline-success" type="submit"><i class="fa fa-check"></i><span class="sr-only">Search</span></button>
+            </form>
+        </div>
+    </nav>
+</header>
+

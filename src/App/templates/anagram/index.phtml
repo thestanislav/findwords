@@ -1,0 +1,245 @@
+<?php
+/** @var \Mimmi20\Mezzio\Navigation\Page\Route $activeNavPage */
+/** @var \Mimmi20\Mezzio\Navigation\Navigation $navigation */
+$navigation = $this->service('DictionaryNavigation');
+$activeNavPage = $navigation->findOneBy('route', 'dictionary-anagram');
+$activeNavPage->setActive(true);
+//$activeNavPage->setDefaultRouter($this->service('Router'));
+
+/** @var $word \App\Entity\Word */
+?>
+
+<div class="p-3 mb-4 bg-light rounded-3">
+
+
+    <?php if (!isset($letters)): ?>
+        <h1>Unscramble Words. Solve Anagram.</h1>
+        <h3>The Magical Power of Anagrams</h3>
+        <p>Are you a fan of anagrams? You have come to the right shop. The site <a href="/">Word Finder</a> helps solve
+            various lexical problems and making
+            anagrams is one of them. We will help you rearrange the letters so that the result will be a new word.</p>
+        <h3>Anagram Features</h3>
+
+        <p>Making anagrams is an exciting lexical game. People who like to play with words have appreciated the benefits
+            of this intellectual pastime.
+            Making anagrams also develops combinatorial thinking which is very important in any human activity. So why
+            not have some practice in making
+            anagrams?</p>
+
+        <p><a href="<?=
+            $this->url('dictionary-anagram') ?>">The section "Solve Anagram"</a> will be useful for those people:</p>
+        <ul>
+            <li>Who are keen on solving anagram crosswords.</li>
+            <li>Who like to play with words.</li>
+            <li>Who wants to Word Unscrambler.</li>
+            <li>Whose job is to compile anagrams (teachers, youth leaders, etc.).</li>
+        </ul>
+    <?php endif; ?>
+    <h3>Solve Anagram / Word Unscrambler</h3>
+
+    <p>Just enter the word in the field and the system will display a block of anagrams and unscrambled words as many as
+        possible for this word.</p>
+
+    <p>The section is also useful for those who like compiling words from other words.
+        You will get a list that begins with 3 letters and ends with 8 or more letters.</p>
+
+
+    <form class="d-flex flex-wrap flex-sm-nowrap justify-content-start align-items-center" method="get" role="form"
+          action="<?= $this->url('dictionary-anagram-search') ?>">
+
+        <label for="anagram_input" class="mb-2 me-sm-2">Enter letters or word</label>
+        <input type="text" name="query"
+               value="<?= $letters ?? '' ?>"
+               class="form-control me-sm-2 mb-2 mb-sm-0" id="anagram_input" placeholder="Word">
+        <button type="submit" class="btn btn-primary mb-2 me-sm-2">Solve</button>
+    </form>
+
+</div>
+<?php
+if (isset($anagram) && count($anagram) > 0 && !$word) {
+    $title = sprintf('The solution to anagram "%s"', $letters);
+    $activeNavPage->addPage(
+        new \Mimmi20\Mezzio\Navigation\Page\Route([
+            'label'  => $title,
+            'route'  => 'dictionary-anagram-term',
+            'params' => ['term' => $letters],
+            'active' => true,
+        ])
+    );
+} elseif (isset($letters) && isset($length)) {
+    $title = sprintf(
+        '%d letter words from word "%s"',
+        $length,
+        $letters
+    );
+    $activeNavPage->addPage(
+        new \Mimmi20\Mezzio\Navigation\Page\Route([
+                'label'  => sprintf($this->translate('Words from the word "%s"'), $letters),
+                'route'  => 'dictionary-anagram-term',
+                'params' => ['term' => $letters],
+                'active' => true,
+                'pages'  => [
+                    new \Mimmi20\Mezzio\Navigation\Page\Route([
+                        'label'  => sprintf('%d letter words', $length),
+                        'route'  => 'dictionary-anagram-term',
+                        'params' => ['term' => $letters, 'length' => $length],
+                        'active' => true,
+                    ])
+                ]
+            ]
+        )
+    );
+} elseif (isset($letters) && $word) {
+    $title = sprintf('Words from the word "%s"', $letters);
+    $activeNavPage->addPage(
+        new \Mimmi20\Mezzio\Navigation\Page\Route([
+            'label'  => sprintf($this->translate('Words from word %s'), $letters),
+            'route'  => 'dictionary-anagram-term',
+            'active' => true
+        ])
+    );
+} elseif (isset($letters)) {
+    $title = sprintf('Words from letters "%s"', $letters);
+    $activeNavPage->addPage(
+        new \Mimmi20\Mezzio\Navigation\Page\Route([
+            'label'  => sprintf($this->translate('Words from %s'), $letters),
+            'route'  => 'dictionary-anagram-term',
+            'active' => true
+        ])
+    );
+} else {
+    $title = 'Anagram Solver';
+}
+
+$this->headMeta()->setProperty('og:title', $title);
+
+if ($title != 'Anagram Solver') {
+    $this->headTitle()->append($title);
+}
+$this->headTitle()->append('Word unscrambler');
+$this->headTitle()->append('Anagram solver');
+?>
+<article>
+    <?php if (isset($letters)): ?>
+        <?php if (!isset($paginator) || $paginator['currentPage'] == 1): ?>
+            <section class="dict-section" itemscope itemtype="http://schema.org/Question">
+                <h2 itemprop="name">Solution to anagram "<?= $letters ?>"</h2>
+                <?php
+                if (isset($anagram) && count($anagram) > 0): ?>
+                    <div class="dict-definition alert alert-info" itemprop="acceptedAnswer" itemscope
+                         itemtype="http://schema.org/Answer">
+                        <?php foreach ($anagram as $_term): ?>
+                            <a itemprop="text" href="<?=
+                            $this->url(
+                                'dictionary-term',
+                                array(
+                                    'term' => $_term->getWord()
+                                )
+                            ) ?>"><?= $_term->getWord() ?></a>
+                        <?php endforeach; ?>
+                    </div>
+                <?php elseif (isset($letters)): ?>
+                    <div class="alert alert-danger">
+                        <p>Sorry, <?= sprintf('can not solve anagram "%s"', $letters) ?>.</p>
+                    </div>
+                <?php endif; ?>
+
+            </section>
+        <?php endif; ?>
+    <?php endif; ?>
+    <?php
+    if (isset($composesWords) && count($composesWords) > 0):?>
+        <h2>Words that can be formed from <?= ($word ? 'word' : '') ?> "<?= $letters ?>"
+            <?php if (isset($paginator) && $paginator['currentPage'] > 1): ?>
+                &ndash; Page <?= $paginator['currentPage']; ?>
+            <?php endif; ?>
+        </h2>
+        <?php
+        echo $this->partial(
+            'anagram::list',
+            array_merge(get_defined_vars(), [
+                'terms' => new ArrayIterator($composesWords)
+            ])
+        );
+    elseif (isset($letters) && $letters):?>
+        <div class="alert alert-danger">
+            <h3><?= $this->translate('Failure!') ?></h3>
+
+            <p>Sorry, <?= sprintf('I can not solve anagram "%s"', $letters) ?>.</p>
+        </div>
+    <?php
+    endif;
+    ?>
+</article>
+
+<?php
+if (isset($paginator)) {
+    echo $this->partial('dictionary::pager', [
+        'paginator' => $paginator
+    ]);
+}
+?>
+
+<?php if (isset($letters)): ?>
+    <aside>
+        <div class="card bg-light">
+            <div class="card-body">
+
+                <?php
+                $_wordStripped = preg_replace('~[^a-zA-Z]+~', '', $letters);
+                $chars = preg_split('~~u', $_wordStripped, -1, PREG_SPLIT_NO_EMPTY);
+                ?>
+                <?php
+                $str = '';
+                for ($i = 0; $i < min(count($chars) - 1, 5); $i++):
+                    $str .= $chars[$i];
+
+                    ?>
+                    <a href="<?=
+                    $this->url(
+                        'dictionary-contains',
+                        array(
+                            'chars'  => $str,
+                            'action' => 'starts'
+                        )
+                    ) ?>">words starting with "<?= $str ?>"</a>,
+                <?php endfor ?>
+
+
+                <?php
+                $str = '';
+                for ($i = count($chars) - 1; $i > max(0, count($chars) - 5); $i--):
+                    $str = $chars[$i] . $str;
+
+                    ?>
+                    <a href="<?=
+                    $this->url(
+                        'dictionary-contains',
+                        array(
+                            'chars'  => $str,
+                            'action' => 'ends'
+                        )
+                    ) ?>">words ending with "<?= $str ?>"</a>,
+                <?php endfor ?>
+
+                <?php
+                $str = '';
+                for ($i = 1; $i < min(count($chars) - 1, 5); $i++):
+                    $str .= $chars[$i];
+
+                    ?>
+                    <a href="<?=
+                    $this->url(
+                        'dictionary-contains',
+                        array(
+                            'chars'  => $str,
+                            'action' => 'contains'
+                        )
+                    ) ?>">words containing "<?= $str ?>"</a>,
+                <?php endfor ?>
+
+            </div>
+        </div>
+    </aside>
+<?php endif; ?>
+<div class="ads-block-horizontal"></div>

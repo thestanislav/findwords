@@ -1,0 +1,105 @@
+<?php
+/** @var \Mimmi20\Mezzio\Navigation\Page\Route $activeNavPage */
+/** @var \Mimmi20\Mezzio\Navigation\Navigation $navigation */
+$navigation = $this->service('DictionaryNavigation');
+foreach($navigation->findAllBy('route', 'dictionary-contains') as $_page){
+    if (array_key_exists('action', $_page->get('params')) && $_page->get('params')['action'] == 'mask') {
+        $activeNavPage = $_page;
+        break;
+    }
+}
+$activeNavPage->setActive(true);
+$activeNavPage->setRouter($this->service(\Mezzio\Router\RouterInterface::class));
+
+/** @var $definitions \Doctrine\Common\Collections\ArrayCollection */
+/** @var $_def  \App\Entity\Definition */
+/** @var $word  \App\Entity\Word */
+
+if (isset($length) && $length > 0 && $mask) {
+    $title = sprintf('%d letter words by mask "%s"', $length, strval($mask));
+    $this->headTitle()->append($title);
+    $this->headTitle()->append('Search words by letters');
+    $this->headMeta()->setProperty('og:title', $title);
+
+    $activeNavPage->addPage(
+        new \Mimmi20\Mezzio\Navigation\Page\Route([
+            'label'  => $mask,
+            'route'  => 'dictionary-contains',
+            'params' => array('chars' => $mask),
+            'action' => 'mask',
+            'active' => true,
+            'pages'  => [
+                new \Mimmi20\Mezzio\Navigation\Page\Route([
+                    'label'  => sprintf('%s letters', $length),
+                    'route'  => 'dictionary-contains',
+                    'action' => 'mask',
+                    'params' => ['chars' => $mask, 'length' => $length],
+                    'active' => true,
+                ])
+            ]
+        ])
+    );
+
+} elseif (isset($mask) && $mask) {
+    $title = sprintf($this->translate('Words matching mask "%s"'), $mask);
+    $this->headTitle()->append($title);
+    $this->headTitle()->append('Search words by letters');
+    $this->headMeta()->setProperty('og:title', $title);
+
+    $activeNavPage->addPage(
+        new \Mimmi20\Mezzio\Navigation\Page\Route([
+            'label'  => $mask,
+            'route'  => 'dictionary-contains',
+            'params' => array('chars' => $mask),
+            'action' => 'mask',
+            'active' => true,
+        ])
+    );
+
+} else {
+    $title = $this->translate('Search words by mask');
+    $this->headTitle()->append($title);
+    $this->headTitle()->append('Search words by letters');
+    $this->headMeta()->setProperty('og:title', $title);
+}
+?>
+<?=
+$this->partial(
+    'word::mask-form',
+    array_merge(get_defined_vars(), [
+        'mask'     => isset($mask) ? $mask : '',
+        'length'   => isset($length) ? $length : 0,
+    ])
+);
+?>
+    <div class="page-header">
+        <h1><?php echo $title; ?></h1>
+    </div>
+    <article>
+        <?php
+        if (isset($terms) && $terms && $terms->count() > 0) :
+            echo $this->partial(
+                'word::list',
+                array(
+                    'terms'    => $terms,
+                    'chars'    => $chars,
+                    'maskMode' => true,
+                    'mask'   => $mask ? : '',
+                )
+            );
+        elseif (isset($terms)):
+            ?>
+            <div class="alert alert-danger">
+                <h3><?= $this->translate('Failure!') ?></h3>
+
+                <p><?= $this->translate('There is no result found.') ?></p>
+            </div>
+        <?php endif; ?>
+    </article>
+<?php
+if (isset($paginator)) {
+    echo $this->partial('dictionary::pager', [
+        'paginator' => $paginator
+    ]);
+}
+?>

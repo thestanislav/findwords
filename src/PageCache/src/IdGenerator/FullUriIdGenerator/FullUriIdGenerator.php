@@ -1,0 +1,28 @@
+<?php
+declare(strict_types=1);
+
+namespace PageCache\IdGenerator\FullUriIdGenerator;
+
+use PageCache\Exception\RuntimeException;
+use PageCache\IdGenerator\IdGeneratorInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
+class FullUriIdGenerator extends AbstractIdGenerator implements IdGeneratorInterface
+{
+    /**
+     * Generate an ID based on the request's host, port, path and query
+     */
+    public function generate(ServerRequestInterface $request): string
+    {
+        $uri = $request->getUri();
+
+        if ('' === $uri->getPath()) {
+            $message = 'Cannot auto-detect current page identity';
+            throw new RuntimeException($message);
+        }
+
+        $vars = [self::SALT, $uri->getPath(), $uri->getPort(), $uri->getHost(), $uri->getQuery()];
+
+        return $this->getHash($vars);
+    }
+}

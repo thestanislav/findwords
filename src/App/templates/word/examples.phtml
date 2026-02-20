@@ -1,0 +1,68 @@
+<?php
+/**
+ * Author: Pavel Zarubov <zara@fu2re.ru>
+ * Date: 18.05.2014
+ * Time: 10:04
+ */
+/* @var $_word \App\Entity\Word */
+/* @var $words array */
+if (!is_array($words) && !($words instanceof \Iterator)) {
+    $words = array($words);
+}
+if ($words instanceof \Iterator){
+    $words = iterator_to_array($words);
+}
+
+$words = array_filter($words, function($w){
+        return $w->getUsageExampleCount() > 0;
+    });
+
+$limit = isset($limit) ? $limit : 15;
+$i = 1;
+$match = (isset($match) && $match) ? $match : false;
+$break = false;
+?>
+<?php if (isset($words) && count($words)): ?>
+    <?php $this->placeholder('examples')->captureStart('SET') ?>
+    <?php foreach ($words as $_word): ?>
+        <?php if ($_word->getUsageExampleCount() > 0): ?>
+
+            <?php foreach ($_word->getUsageExamples() as $_usageExample): ?>
+                <p><?php
+                    $_match = $match ? : $_usageExample->getMatchedWord();
+                    echo $this->HilightSyllables($_usageExample->getExample(), $_match, 'u')
+                    ?></p>
+                <?php
+                if (++$i > $limit) {
+                    $break = true;
+                    break;
+                }
+                ?>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        <?php
+        if ($break) {
+            break;
+        }
+        ?>
+    <?php endforeach; ?>
+    <?php $this->placeholder('examples')->captureEnd() ?>
+<?php endif; ?>
+
+<?php
+$content = trim($this->placeholder('examples'));
+if ($content):
+    ?>
+    <section class="dict-word-usage">
+        <div class="bg-info">
+            <?php if (isset($title) && $title): ?>
+                <h4><?= $title ?></h4>
+            <?php endif; ?>
+            <?= $this->placeholder('examples') ?>
+        </div>
+    </section>
+
+    <?=$this->partial('dictionary::context-ads')?>
+
+<?php endif; ?>
+

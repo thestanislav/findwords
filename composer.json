@@ -1,0 +1,183 @@
+{
+    "name": "mezzio/mezzio-skeleton",
+    "description": "Laminas mezzio skeleton. Begin developing PSR-15 middleware applications in seconds!",
+    "type": "project",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "laminas",
+        "mezzio",
+        "skeleton",
+        "middleware",
+        "psr",
+        "psr-7",
+        "psr-11",
+        "psr-15"
+    ],
+    "homepage": "https://mezzio.dev",
+    "support": {
+        "docs": "https://docs.mezzio.dev/mezzio/",
+        "issues": "https://github.com/mezzio/mezzio-skeleton/issues",
+        "source": "https://github.com/mezzio/mezzio-skeleton",
+        "rss": "https://github.com/mezzio/mezzio-skeleton/releases.atom",
+        "chat": "https://laminas.dev/chat",
+        "forum": "https://discourse.laminas.dev"
+    },
+    "config": {
+        "platform-check": false,
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "composer/package-versions-deprecated": true,
+            "laminas/laminas-component-installer": true
+        },
+        "platform": {
+            "php": "8.3"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "prefer-dist": true,
+    "extra": {
+        "laminas": {
+            "component-whitelist": [
+                "mezzio/mezzio",
+                "mezzio/mezzio-helpers",
+                "mezzio/mezzio-router",
+                "laminas/laminas-httphandlerrunner",
+                "mezzio/mezzio-fastroute",
+                "mezzio/mezzio-laminasviewrenderer"
+            ]
+        }
+    },
+    "require": {
+        "php": "~8.3.0",
+        "ext-dom": "*",
+        "ext-intl": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-pdo": "*",
+        "ext-pdo_mysql": "*",
+        "ext-swoole": "^6.0",
+        "ext-xml": "*",
+        "alextartan/mezzio-symfony-console": "3.1",
+        "composer/package-versions-deprecated": "^1.10.99",
+        "doctrine/data-fixtures": "^2.0",
+        "doctrine/doctrine-orm-module": "^6.3",
+        "foolz/sphinxql-query-builder": "^3.0",
+        "gedmo/doctrine-extensions": "^3.10",
+        "laminas/laminas-cache-storage-adapter-blackhole": "^2.4",
+        "laminas/laminas-cache-storage-adapter-memcached": "^2.5",
+        "laminas/laminas-component-installer": "^2.6 || ^3.0",
+        "laminas/laminas-config-aggregator": "^1.6",
+        "laminas/laminas-diactoros": "^3.0.0",
+        "laminas/laminas-i18n": "^2.1",
+        "laminas/laminas-serializer": "^2.18",
+        "laminas/laminas-servicemanager": "^3.22",
+        "laminas/laminas-session": "^2.10",
+        "laminas/laminas-stdlib": "^3.6",
+        "mezzio/mezzio": "^3.7",
+        "mezzio/mezzio-authentication": "^1.1",
+        "mezzio/mezzio-fastroute": "^3.11.0",
+        "mezzio/mezzio-helpers": "^5.7",
+        "mezzio/mezzio-laminasviewrenderer": "^2.15",
+        "mezzio/mezzio-swoole": "^4.0",
+        "mimmi20/laminasviewrenderer-helper-htmlelement": "^3.1",
+        "mimmi20/mezzio-navigation": "*",
+        "mimmi20/mezzio-navigation-laminasviewrenderer": "^7.0",
+        "monolog/monolog": "^3.0",
+        "theseer/css2xpath": "^2.0"
+    },
+    "require-dev": {
+        "laminas/laminas-coding-standard": "~2.5.0",
+        "laminas/laminas-development-mode": "^3.12.0",
+        "mezzio/mezzio-tooling": "^2.9",
+        "phpunit/phpunit": "^10.5.5",
+        "psalm/plugin-phpunit": "^0.18.4",
+        "roave/security-advisories": "dev-master",
+        "vimeo/psalm": "^5.18",
+        "filp/whoops": "^2.15.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/App/src/",
+            "Bot\\": "src/Bot/src/",
+            "PageCache\\": "src/PageCache/src",
+            "ExprAs\\Core\\": "vendor/expras/core/src",
+            "ExprAs\\CKEditor\\": "vendor/expras/ckeditor/src",
+            "ExprAs\\Doctrine\\": "vendor/expras/doctrine/src",
+            "ExprAs\\Crud\\": "vendor/expras/crud/src",
+            "ExprAs\\Telegram\\": "vendor/expras/telegram/src",
+            "ExprAs\\Admin\\": "vendor/expras/admin/src",
+            "ExprAs\\AdminGenerator\\": "vendor/expras/admin/src",
+            "ExprAs\\User\\": "vendor/expras/user/src",
+            "ExprAs\\Rbac\\": "vendor/expras/rbac/src",
+            "ExprAs\\KCFinder\\": "vendor/expras/kcfinder/src",
+            "ExprAs\\ElFinder\\": "vendor/expras/elfinder/src",
+            "ExprAs\\Mailer\\": "vendor/expras/mailer/src",
+            "ExprAs\\Cron\\": "vendor/expras/cron/src",
+            "ExprAs\\Dom\\": "vendor/expras/dom/src",
+            "ExprAs\\Uploadable\\": "vendor/expras/uploadable/src",
+            "ExprAs\\Rest\\": "vendor/expras/rest/src",
+            "ExprAs\\Locale\\": "vendor/expras/locale/src",
+            "ExprAs\\Pages\\": "vendor/expras/pages/src",
+            "ExprAs\\View\\": "vendor/expras/view/src",
+            "ExprAs\\Block\\": "vendor/expras/block/src",
+            "ExprAs\\Asset\\": "vendor/expras/asset/src",
+            "ExprAs\\Logger\\": "vendor/expras/logger/src",
+            "ExprAs\\Helpers\\": "vendor/expras/helpers/src",
+            "ExprAs\\Navigation\\": "vendor/expras/navigation/src",
+            "ExprAs\\Nutgram\\": "packages/expras/nutgram/src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AppTest\\": "test/AppTest/",
+            "ExprAs\\Core\\": "packages/expras/core/src",
+            "ExprAs\\Doctrine\\": "packages/expras/doctrine/src",
+            "ExprAs\\Admin\\": "packages/expras/admin/src",
+            "ExprAs\\User\\": "packages/expras/user/src",
+            "ExprAs\\Rbac\\": "packages/expras/rbac/src",
+             "ExprAs\\Mailer\\": "packages/expras/mailer/src",
+            "ExprAs\\Cron\\": "packages/expras/cron/src",
+            "ExprAs\\Uploadable\\": "packages/expras/uploadable/src",
+            "ExprAs\\Rest\\": "packages/expras/rest/src",
+            "ExprAs\\Dom\\": "packages/expras/dom/src",
+            "ExprAs\\View\\": "packages/expras/view/src",
+            "ExprAs\\Asset\\": "packages/expras/asset/src",
+            "ExprAs\\Logger\\": "packages/expras/logger/src",
+            "ExprAs\\Helpers\\": "packages/expras/helpers/src"
+        }
+    },
+    "scripts": {
+        "post-create-project-cmd": [
+            "@development-enable"
+        ],
+        "post-install-cmd": "@clear-config-cache",
+        "post-update-cmd": "@clear-config-cache",
+        "development-disable": "laminas-development-mode disable",
+        "development-enable": "laminas-development-mode enable",
+        "development-status": "laminas-development-mode status",
+        "mezzio": "laminas --ansi",
+        "check": [
+            "@cs-check",
+            "@test"
+        ],
+        "clear-config-cache": "php bin/clear-config-cache.php",
+        "enable-codestandard": "Dealerdirect\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run",
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "php -S 0.0.0.0:8080 -t public/"
+        ],
+        "static-analysis": "psalm --stats",
+        "static-analysis-update-baseline": "psalm --stats --update-baseline",
+        "test": "phpunit --colors=always",
+        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
+    },
+    "scripts-descriptions": {
+        "clear-config-cache": "Clears merged config cache. Required for config changes to be applied.",
+        "static-analysis": "Run static analysis tool Psalm.",
+        "static-analysis-update-baseline": "Run static analysis tool Psalm and update baseline."
+    }
+}

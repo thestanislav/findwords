@@ -1,0 +1,138 @@
+<?php
+/**
+ * Author: Pavel Zarubov <zara@fu2re.ru>
+ * Date: 10/21/2017
+ * Time: 19:17
+ */
+/** @var $definition \App\Entity\Definition */
+/** @var $alternativeDefinitions \App\Entity\Definition[] */
+/** @var $dictionaryDefinitions \App\Entity\Definition[] */
+/** @var \Mimmi20\Mezzio\Navigation\Page\Route $activeNavPage */
+/** @var \Mimmi20\Mezzio\Navigation\Navigation $navigation */
+
+$length = mb_strlen($definition->getWord()->getWord());
+$this->headTitle(sprintf('%s, %d %s',
+    $definition->getContent(),
+    $length,
+    $this->plural(['letter', 'letters'], $length)
+));
+
+$this->headMeta()->appendName('description', sprintf('The answer for clue: %s', $definition->getContent()));
+
+$navigation = $this->service('DictionaryNavigation');
+$activeNavPage = $navigation->findOneBy('route', 'dictionary-crossword-definition');
+$activeNavPage->setActive(true);
+$activeNavPage->setParams([
+    'definition_id' => $definition->getId()
+]);
+$activeNavPage->setLabel($definition->getContent());
+
+?>
+
+
+<div class="p-3 mb-4 bg-light rounded-3">
+
+    <h2>Search for crossword answers and clues</h2>
+
+    <form method="get" role="form" action="<?= $this->url('dictionary-crossword') ?>">
+        <div class="row">
+            <div class="col-sm-7">
+                <label class="sr-only" for="term_input">Word</label>
+                <input type="text" name="query"
+                       value="<?= $definition->getContent()?>"
+                       class="form-control mb-2" id="term_input" placeholder="Enter the clue">
+            </div>
+            <div class="col-sm-3">
+                <label class="sr-only" for="length_input">Letter count</label>
+                <select class="form-control mb-2" name="length" id="length_input">
+                    <option value="">Letter count</option>
+                    <?php foreach (range(2, 15) as $_l):?>
+                        <option value="<?= $_l?>"><?= $_l?></option>
+                    <?php endforeach;?>
+                </select>
+            </div>
+            <div class="col-sm-2 text-right">
+                <button type="submit" class="btn btn-primary">Find</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<div itemscope itemtype="https://schema.org/FAQPage">
+    <div itemprop="mainEntity"  itemscope itemtype="http://schema.org/Question" id="cw_qb">
+
+        <div class="page-header">
+            <h1 itemprop="name"><?= $definition->getContent() ?></h1>
+            <meta itemprop="text"
+                  content="<?= $this->escapeHtmlAttr($definition->getContent()) ?>, <?= $length ?> <?= $this->plural(['letter', 'letters'], $length) ?>">
+        </div>
+        <div itemprop="acceptedAnswer" itemscope itemtype="http://schema.org/Answer" class="alert alert-success">
+            <p>
+                Answer for the clue "<?= $definition->getContent() ?>
+                ", <?= $length ?> <?= $this->plural(['letter', 'letters'], $length) ?>:<br> <strong
+                        itemprop="text"><?= $definition->getMatchTerm() ?></strong>
+            </p>
+        </div>
+    </div>
+</div>
+<?php if (count($alternativeDefinitions)):
+    ?>
+    <section class="dict-section">
+        <h3>Alternative clues for the word <?= $definition->getWord()->getWord() ?> </h3>
+        <div class="dict-definition">
+            <ul>
+                <?php foreach ($alternativeDefinitions as $_definition): ?>
+                    <li>
+                        <a href="<?= $this->url('dictionary-crossword-definition', ['definition_id' => $_definition->getId()]) ?>"><?= $_definition->getContent() ?></a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    </section>
+<?php endif; ?>
+
+<?php if (count($dictionaryDefinitions)):
+    $counter = 1;
+    ?>
+    <section class="dict-section">
+        <h3>Word definitions for <?= $definition->getWord()->getWord() ?> in dictionaries</h3>
+        <div class="dict-definition">
+            <?php
+            $dictPassed = [];
+            foreach ($dictionaryDefinitions as $_definition):
+                if (!in_array($_definition->getDictionary()->getId(), $dictPassed)):
+                    ?>
+                    <p>
+                        <strong><?= $_definition->getDictionary()->getTitle() ?></strong>
+                        <a href="<?= $this->url('dictionary-term', [
+                            'term' => $definition->getWord()->getWord()
+                        ]) ?>#dict<?= $_definition->getDictionary()->getId() ?>"><i
+                                    class="fa fa-external-link-square"></i>
+                            <span class="sr-only">Word definitions in <?= $_definition->getDictionary()->getTitle() ?></span>
+                        </a>
+                        <br>
+                        <?= $this->truncate($_definition->getContent(), 256)->stripTags()->breakWord() ?>
+                    </p>
+                    <?php
+                    $dictPassed[] = $_definition->getDictionary()->getId();
+                endif;
+                ?>
+            <?php endforeach; ?>
+        </div>
+    </section>
+<?php endif; ?>
+
+
+<?php echo $this->partial(
+    'word::examples',
+    array(
+        'words' => $definition->getWord(),
+        'title' => sprintf('Usage examples of %s.', $definition->getWord()->getWord())
+    )
+) ?>
+
+<?php
+$this->headTitle('Crossword clues, answers, solver');
+?>
+
+

@@ -1,0 +1,432 @@
+<?php
+/** @var \Mimmi20\Mezzio\Navigation\Page\Route $activeNavPage */
+/** @var \Mimmi20\Mezzio\Navigation\Navigation $navigation */
+$navigation = $this->service('DictionaryNavigation');
+$activeNavPage = $navigation->findOneBy('route', 'dictionary-term');
+$activeNavPage->setActive(true);
+//$activeNavPage->setDefaultRouter($this->service('Router'));
+$this->headMeta()->setProperty('og:type', 'article');
+
+/** @var $definitions \Doctrine\Common\Collections\ArrayCollection */
+/** @var $_def  \App\Entity\Definition */
+/** @var $word  \App\Entity\Word */
+
+?>
+    <div class="p-3 mb-4 bg-light rounded-3">
+        <?php if (!isset($word)): ?>
+            <h1>Word definitions</h1>
+            <p>This section is useful when you need to define the meaning of a word. It may be especially difficult if
+                the word you deal with is a neologism or
+                borrowed from other languages. There are also calques that are literal translations of foreign phrases.
+                It’s next to impossible to understand
+                their
+                meaning without knowing the language. In such cases the section <a
+                        href="<?= $this->url('dictionary-term') ?>">“Word definitions”</a>
+                is especially helpful. You will really find it simple and convenient to work with this section.</p>
+
+
+            <h3>Why is it so important to interpret words correctly?</h3>
+            <p>It should be noted that a word can have several meanings, which is known in lexicology as polysemy.
+                Our site is for those people who seek to improve their vocabulary through discovering the lexical
+                meaning of new words
+                or new meanings of a well-known ambiguous word.</p>
+
+            <h3>How to Search for Words</h3>
+
+            <p>The section is very easy to use. There is a field where you can enter the word and get a list of its
+                meanings.
+                The data is provided from different sources ‒ encyclopedic, explanatory and word-formation dictionaries.
+                Here you can also find examples illustrating the use of the words you are interested in.
+                <a href="<?= $this->url('dictionary-term') ?>">Search for the meanings of a word</a> and check it out!
+            </p>
+
+        <?php endif; ?>
+
+        <h3>Find the word definition</h3>
+
+        <form class="d-flex flex-wrap flex-sm-nowrap justify-content-start align-items-center" method="get" role="form" action="<?= $this->url('dictionary-search') ?>">
+            <label for="term_input" class="text-nowrap me-sm-2 mb-sm-0 form-label d-none d-sm-block">Enter the word</label>
+            <input type="text" name="query"
+                   value="<?= rawurldecode($query) ?>"
+                   class="form-control me-sm-2 mb-2 mb-sm-0" id="term_input" placeholder="Word">
+            <button type="submit" class="btn btn-primary ms-auto">Find</button>
+        </form>
+
+    </div>
+
+<?php
+$foundDictionaries = array();
+   $crosswordDefinitions = array();
+
+if (isset($word) && isset($definitions) && $definitions->count() > 0):
+
+    $counter = 0;
+    $phrases = [];
+    if ($definitions->count() > 0) {
+        foreach ($definitions as $_def):
+            $dict = $_def->getDictionary();
+
+            if ($dict->getDefinedName() == 'crossword') {
+                $crosswordDefinitions[] = $_def;
+            } elseif (!isset($foundDictionaries[$dict->getId()])) {
+                $foundDictionaries[$dict->getId()] = $dict;
+                $phrases[$dict->getId()] = [];
+            }
+            $this->placeholder($dict->getDefinedName())->captureStart();
+
+            if (!$_def->getWord()->getIsPhrase() || $_def->getWord()->getWord() == $word->getWord()): ?>
+                <div class="dict-definition">
+                    <strong itemprop="term"><?php
+                        echo $_def->getMatchTerm() ?: $_def->getWord()->getWord();
+                        ?></strong>
+                    <div itemprop="definition">
+                        <?= $this->LinkelizeTerms($_def->getContent()); ?>
+                    </div>
+                </div>
+                <?php
+                if ((++$counter) == 1 || $counter % 3 == 0) {
+                    echo $this->partial('dictionary::context-ads');
+                } ?>
+            <?php
+            else:
+                $phrases[$dict->getId()][] = [
+                    'phrase' => $_def->getWord()->getWord(),
+                    'match' => $_def->getMatchTerm() ?: $_def->getWord()->getWord()
+                ];
+            endif;
+            ?>
+            <?php
+            $this->placeholder($dict->getDefinedName())->captureEnd();
+        endforeach;
+        usort(
+            $foundDictionaries,
+            function ($a, $b) {
+                return ($a->getSortOrder() > $b->getSortOrder()) ? +1 : -1;
+            }
+        );
+    }
+    if (count($foundDictionaries) == 0 && count($crosswordDefinitions) > 0) {
+        $this->headTitle()->append(sprintf('Crossword clues for %s', $word->getWord()));
+        $this->headMeta()->setProperty('og:title', sprintf('Crossword clues for %s', $word->getWord()));
+    } elseif (!$word->getIsPhrase()) {
+        $this->headTitle()->append(sprintf(('What does %s mean'), $word->getWord()));
+        $this->headTitle()->append(sprintf(('Definition of %s'), $word->getWord()));
+        $this->headMeta()->setProperty('og:title', sprintf(('What does %s mean'), $word->getWord()));
+    } else {
+        $this->headTitle()->append(sprintf(('What is %s'), $word->getWord()));
+        $this->headTitle()->append(sprintf(('Definition of %s'), $word->getWord()));
+        $this->headMeta()->setProperty('og:title', sprintf(('What is %s'), $word->getWord()));
+    }
+    $this->headMeta()->appendName('keywords', $word->getWord());
+
+
+    $activeNavPage->addPage(
+        new \Mimmi20\Mezzio\Navigation\Page\Route([
+            'label' => $word->getWord(),
+            'route' => 'dictionary-term',
+            'params' => array('term' => $word),
+            'active' => true,
+        ])
+    );
+
+    ?>
+    <div class="page-header">
+        <h1><?php
+
+            if (count($foundDictionaries) == 0 && count($crosswordDefinitions) > 0) {
+                echo sprintf('Crossword clues for %s', $word->getWord());
+            } else {
+                echo sprintf(('What is "%s"'), $word->getWord());
+            }
+            ?></h1>
+    </div>
+    <article>
+        <?php
+        if (count($crosswordDefinitions) > 0):
+            /** @var \App\Entity\Definition $def */
+            $_def = current($crosswordDefinitions);
+            $crosswordDefinitionTotal = count($crosswordDefinitions);
+            ?>
+            <section class="dict-section crossword-section" itemscope
+                     itemtype="http://webmaster.yandex.ru/vocabularies/term-def.xml">
+                <h3 itemprop="source"><?php
+                    if (count($foundDictionaries) > 0) {
+                        printf('Crossword clues for %s', $word->getWord());
+                    } else {
+                        $_def->getDictionary()->getTitle();
+                    }
+
+                    ?></h3>
+                <div class="dict-definition">
+                    <h5 itemprop="term"><?= $_def->getMatchTerm() ?></h5>
+                    <?php
+                    if ($crosswordDefinitionTotal > 2):
+                        $crosswordDefinitionsFirstPart = array_splice($crosswordDefinitions, floor(count($crosswordDefinitions) / 2));
+                        ?>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <ul class="styled" itemprop="definition">
+                                    <?php foreach ($crosswordDefinitionsFirstPart as $_def): ?>
+                                        <li>
+                                            <a href="<?= $this->url('dictionary-crossword-definition', [
+                                                'definition_id' => $_def->getId()
+                                            ]) ?>"><?= $_def->getContent() ?></a>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <ul class="styled" itemprop="definition">
+                                    <?php foreach ($crosswordDefinitions as $_def): ?>
+                                        <li>
+                                            <a href="<?= $this->url('dictionary-crossword-definition', [
+                                                'definition_id' => $_def->getId()
+                                            ]) ?>"><?= $_def->getContent() ?></a>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <ul class="styled" itemprop="definition">
+                            <?php foreach ($crosswordDefinitions as $_def): ?>
+                                <li>
+                                    <a href="<?= $this->url('dictionary-crossword-definition', [
+                                        'definition_id' => $_def->getId()
+                                    ]) ?>"><?= $_def->getContent() ?></a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </div>
+            </section>
+            <?php echo $this->partial('dictionary::context-ads'); ?>
+        <?php endif; ?>
+
+        <?php foreach ($foundDictionaries as $_dict): ?>
+            <section class="dict-section" itemscope itemtype="http://webmaster.yandex.ru/vocabularies/term-def.xml">
+                <h5 itemprop="source"><?php echo $_dict->getTitle() ?></h5>
+                <?php echo $this->placeholder($_dict->getDefinedName()) ?>
+                <?php if (count($phrases[$_dict->getId()])):
+
+                    ?>
+                    <div class="dict-definition related-phrases">
+                        <h5>Related phrases:</h5>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <ul class="styled">
+                                    <?php
+                                    $total = count($phrases[$_dict->getId()]);
+                                    $cnter = 0;
+                                    while (count($phrases[$_dict->getId()])):
+                                        if (++$cnter > ceil($total / 3)) {
+                                            break;
+                                        }
+                                        $_phrase = array_shift($phrases[$_dict->getId()]);
+                                        ?>
+                                        <li><a href="<?=
+                                            $this->url(
+                                                'dictionary-term',
+                                                array(
+                                                    'term' => rawurlencode($_phrase['phrase'])
+                                                )
+                                            ) ?>"><?= $_phrase['match'] ?></a></li>
+                                    <?php endwhile; ?>
+                                </ul>
+                            </div>
+                            <div class="col-sm-4">
+                                <ul class="styled">
+                                    <?php
+                                    $cnter = 0;
+                                    while (count($phrases[$_dict->getId()])):
+                                        if (++$cnter > ceil($total / 3)) {
+                                            break;
+                                        }
+                                        $_phrase = array_shift($phrases[$_dict->getId()]);
+                                        ?>
+                                        <li><a href="<?=
+                                            $this->url(
+                                                'dictionary-term',
+                                                array(
+                                                    'term' => rawurlencode($_phrase['phrase'])
+                                                )
+                                            ) ?>"><?= $_phrase['match'] ?></a></li>
+                                    <?php endwhile; ?>
+                                </ul>
+                            </div>
+                            <div class="col-sm-4">
+                                <ul class="styled">
+                                    <?php
+                                    while (count($phrases[$_dict->getId()])):
+                                        $_phrase = array_shift($phrases[$_dict->getId()]);
+                                        ?>
+                                        <li><a href="<?=
+                                            $this->url(
+                                                'dictionary-term',
+                                                array(
+                                                    'term' => rawurlencode($_phrase['phrase'])
+                                                )
+                                            ) ?>"><?= $_phrase['match'] ?></a></li>
+                                    <?php endwhile; ?>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                <?php endif; ?>
+            </section>
+        <?php endforeach; ?>
+
+        <?php if (count($crosswordDefinitions) == 0 && count($foundDictionaries) == 0): ?>
+            <div class="alert alert-warning">
+                <p>Could not find any definition of <?= ($word->getIsPhrase() ? 'phrase' : 'word') ?>
+                    "<?= $word->getWord() ?>"</p>
+            </div>
+        <?php endif; ?>
+
+        <?php echo $this->partial(
+            'word::examples',
+            array(
+                'words' => $word,
+                'title' => sprintf('Usage examples of "%s".', $word->getWord())
+            )
+        ) ?>
+    </article>
+    <aside>
+        <div class="card panel-see-more">
+            <div class="card-header bg-secondary text-white"><strong><?= ('See also') ?>:</strong></div>
+            <div class="card-body">
+                <?php
+                $_words = preg_split('~\s~', $word->getWord());
+                foreach ($_words as $_word):
+                    if (!preg_match('~^[a-z \-]+$~i', $_word)) {
+                        continue;
+                    }
+                    ?>
+                    <a href="<?=
+                    $this->url(
+                        'dictionary-rhyme-term',
+                        array(
+                            'term' => $_word
+                        )
+                    ) ?>">words rhyming with <?= $_word ?></a>,
+                <?php endforeach; ?>
+
+                <?php
+                foreach ($_words as $_word):
+                    if (!preg_match('~^[a-z \-]+$~i', $_word)) {
+                        continue;
+                    }
+                    ?>
+                    <a href="<?=
+                    $this->url(
+                        'dictionary-anagram-term',
+                        array(
+                            'term' => rawurlencode($_word)
+                        )
+                    ) ?>">words from word "<?= $_word ?>"</a>,
+                <?php endforeach; ?>
+
+
+                <?php
+                if (!$word->getIsPhrase()):
+                    $_wordStripped = preg_replace('~[^a-z]+~u', '', $word->getWord());
+                    $chars = preg_split('~~u', $_wordStripped, -1, PREG_SPLIT_NO_EMPTY);
+                    ?>
+                    <?php
+                    $str = '';
+                    for ($i = 0; $i < min(count($chars) - 1, 5); $i++):
+                        $str .= $chars[$i];
+
+                        ?>
+                        <a href="<?=
+                        $this->url(
+                            'dictionary-contains',
+                            array(
+                                'chars' => $str,
+                                'action' => 'starts'
+                            )
+                        ) ?>">words starting with "<?= $str ?>"</a>,
+                    <?php endfor ?>
+
+
+                    <?php
+                    $str = '';
+                    for ($i = count($chars) - 1; $i > max(0, count($chars) - 5); $i--):
+                        $str = $chars[$i] . $str;
+
+                        ?>
+                        <a href="<?=
+                        $this->url(
+                            'dictionary-contains',
+                            array(
+                                'chars' => rawurlencode($str),
+                                'action' => 'ends'
+                            )
+                        ) ?>">words ending with "<?= $str ?>"</a>,
+                    <?php endfor ?>
+
+                    <?php
+                    $str = '';
+                    for ($i = 1; $i < min(count($chars) - 1, 5); $i++):
+                        $str .= $chars[$i];
+
+                        ?>
+                        <a href="<?=
+                        $this->url(
+                            'dictionary-contains',
+                            array(
+                                'chars' => rawurlencode($str),
+                                'action' => 'contains'
+                            )
+                        ) ?>">words containing "<?= $str ?>"</a>,
+                    <?php endfor ?>
+                <?php endif ?>
+
+            </div>
+        </div>
+    </aside>
+    <?php
+
+    $description = sprintf('Word definitions in dictionaries ', $word->getWord());
+    $description .= $dictionaryTitles = implode(', ', array_unique(array_map(function ($_def) {
+        return $_def->getDictionary()->getTitle();
+    }, iterator_to_array($definitions))));
+
+    $this->headMeta()->setProperty('og:description', $description);
+    $this->headMeta()->appendName('description', $description);
+
+    $this->headScript()->appendScript(
+        '{
+			"@context": "http://schema.org",
+			"@type": "WebSite",
+			"url": "' . $this->serverUrl('/') . '",
+			"potentialAction": {
+				"@type": "SearchAction",
+				"target": "' . $this->serverUrl('/term/search?query') . '={query}",
+				"query-input": "required name=query",
+				"description" : "Search word definitions in ' . htmlspecialchars($dictionaryTitles) . '"
+			}
+		}',
+        'application/ld+json',
+        array('noescape' => true)
+    );
+
+    ?>
+
+<?php elseif (isset($query) && $query): ?>
+    <div class="alert alert-danger">
+        <h3><?= ('Failure!') ?></h3>
+
+        <p><?=
+            sprintf(
+                ('Sorry, there is no definition of %s found.'),
+                sprintf(
+                    '<strong>%s</strong>',
+                    $query
+                )
+            ) ?></p>
+    </div>
+<?php endif; ?>

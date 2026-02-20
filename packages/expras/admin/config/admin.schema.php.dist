@@ -1,0 +1,259 @@
+<?php
+
+/**
+ * Admin Configuration Schema
+ * This file defines the structure for admin.php configuration
+ */
+
+/**
+ * @typedef InputValidation
+ * @property string $name One of: "maxLength", "minLength", "regex", "email", "number", "required", "custom", "min", "max"
+ * @property mixed[] $args
+ */
+
+/**
+ * @typedef Choice
+ * @property mixed $id
+ * @property string $name
+ */
+
+/**
+ * @typedef FormInput
+ * @property string $source
+ * @property string $label
+ * @property string $type One of: "reference", "text", "textarea", "number", "select", "toOne", "toMany", "date", "datetime", "boolean", "file", "image", "password", "html", "rich-text", "array", "radio", "autocomplete"
+ * @property bool $required
+ * @property bool $fullWidth
+ * @property string $helperText
+ * @property string $placeholder
+ * @property string $format
+ * @property string $parse
+ * @property InputValidation[] $validate
+ * @property string $reference
+ * @property string $target
+ * @property Choice[] $choices
+ * @property string $optionText
+ * @property string $optionValue
+ * @property bool $multiple
+ * @property mixed $defaultValue
+ * @property bool $disabled
+ * @property array<string,mixed> $sx
+ * @property bool $translateChoice
+ * @property string[] $suggestions
+ * @property int $debounce
+ * @property mixed $emptyValue
+ * @property string $emptyText
+ * @property bool $resettable
+ * @property string $transform
+ * @property bool $autoFocus
+ * @property bool $isLoading
+ */
+
+/**
+ * @typedef ListComponent
+ * @property string $type
+ * @property string $source
+ * @property bool $sortable
+ * @property string $label
+ * @property string $sortBy
+ * @property string $textAlign One of: "inherit", "left", "center", "right", "justify"
+ * @property string $headerClassName
+ * @property string $cellClassName
+ * @property string $emptyText
+ * @property bool $translateChoice
+ * @property Choice[] $choices
+ * @property array<string,mixed> $sx
+ */
+
+/**
+ * @typedef ListFields
+ * @property string|string[] $primarySource
+ * @property string|string[] $secondarySource
+ * @property string|string[] $tertiarySource
+ * @property ListComponent[] $components
+ */
+
+/**
+ * @typedef Filter
+ * @property string $source
+ * @property string $type
+ * @property string $label
+ * @property bool $alwaysOn
+ * @property mixed $defaultValue
+ * @property array<string,mixed> $sx
+ */
+
+/**
+ * @typedef AdvanceFilterField
+ * @property string $title
+ * @property string $name
+ * @property string $type
+ */
+
+/**
+ * @typedef FilterListItem
+ * @property string $label
+ * @property string $icon
+ * @property mixed $value
+ * @property string[] $isSelected
+ * @property string[] $toggleFilter
+ */
+
+/**
+ * @typedef FilterList
+ * @property string $label
+ * @property string $icon
+ * @property FilterListItem[] $items
+ */
+
+/**
+ * @typedef Action
+ * @property string $name
+ * @property string $label
+ * @property string $icon
+ * @property string $onClick
+ * @property array<string,mixed> $sx
+ */
+
+/**
+ * @typedef AsidePanel
+ * @property string $type
+ * @property array<string,mixed> $props
+ */
+
+/**
+ * @typedef QueryOptions
+ * @property int|bool $retry
+ * @property int $staleTime
+ * @property int $refetchInterval
+ */
+
+/**
+ * @typedef MutationOptions
+ * @property int|bool $retry
+ * @property string $onSuccess
+ * @property string $onError
+ */
+
+/**
+ * @typedef ResourceMapping
+ * @property class-string $entity
+ * @property string $name
+ * @property string[] $excludeFields
+ * @property string $icon
+ * @property array{
+ *   options?: array{
+ *     label?: string,
+ *     recordRepresentation?: string|callable
+ *   },
+ *   form?: array{
+ *     inputs: FormInput[]
+ *   },
+ *   list?: array{
+ *     fields?: ListFields,
+ *     filters?: Filter[],
+ *     advanceFilter?: array{
+ *       enabled: bool,
+ *       fields: AdvanceFilterField[]
+ *     },
+ *     filterList?: array{
+ *       lists?: FilterList[],
+ *       savedQueriesList?: bool,
+ *       filterLiveSearch?: bool
+ *     },
+ *     expandPanel?: array{
+ *       type?: string,
+ *       content?: array<string,mixed>
+ *     },
+ *     sort?: array{field: string, order: "ASC"|"DESC"},
+ *     perPage?: int,
+ *     filter?: array<string,mixed>,
+ *     disableFuzzySearch?: bool,
+ *     disableExport?: bool,
+ *     disableFilter?: bool,
+ *     disableCreate?: bool,
+ *     disableDelete?: bool,
+ *     disableEdit?: bool,
+ *     disableShow?: bool,
+ *     disableClone?: bool,
+ *     exporter?: string,
+ *     empty?: string|array,
+ *     actions?: (string|Action)[],
+ *     aside?: AsidePanel,
+ *     pagination?: array{
+ *       perPage?: int,
+ *       rowsPerPageOptions?: int[],
+ *       sx?: array<string,mixed>
+ *     },
+ *     rowStyle?: string,
+ *     rowClick?: "edit"|"show"|"expand"|"select"|string,
+ *     bulkActionButtons?: bool|(string|array)[],
+ *     queryOptions?: QueryOptions
+ *   },
+ *   edit?: array{
+ *     title?: string,
+ *     disableDelete?: bool,
+ *     disableEditActions?: bool,
+ *     actions?: (string|Action)[],
+ *     aside?: AsidePanel,
+ *     redirect?: string|bool,
+ *     transform?: string,
+ *     mutationMode?: "pessimistic"|"optimistic"|"undoable",
+ *     mutationOptions?: MutationOptions,
+ *     warnWhenUnsavedChanges?: bool
+ *   },
+ *   create?: array{
+ *     title?: string,
+ *     disableCreateActions?: bool,
+ *     actions?: (string|Action)[],
+ *     aside?: AsidePanel,
+ *     redirect?: string|bool,
+ *     transform?: string,
+ *     mutationOptions?: MutationOptions,
+ *     warnWhenUnsavedChanges?: bool
+ *   },
+ *   show?: array{
+ *     title?: string,
+ *     disableShowActions?: bool,
+ *     actions?: (string|Action)[],
+ *     aside?: AsidePanel,
+ *     expand?: array{
+ *       type: string,
+ *       content?: array<string,mixed>
+ *     }
+ *   },
+ *   dashboard?: array{
+ *     widgets?: array<array{
+ *       type: string,
+ *       props?: array<mixed>,
+ *       sx?: array<string,mixed>
+ *     }>
+ *   }
+ * } $spec
+ */
+
+/**
+ * @typedef Route
+ * @property string $name
+ * @property string $path
+ * @property string $method
+ * @property class-string[] $middleware
+ * @property array $defaults
+ * @property array $options
+ */
+
+/**
+ * @typedef AdminConfig
+ * @property Route[] $routes
+ * @property array<string,ResourceMapping> $resource_mappings
+ */
+
+/**
+ * @return array{exprass_admin: AdminConfig}
+ */
+return [
+    'exprass_admin' => [
+        'routes' => [],
+        'resource_mappings' => []
+    ]
+]; 

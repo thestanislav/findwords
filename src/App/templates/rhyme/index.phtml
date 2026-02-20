@@ -1,0 +1,209 @@
+<?php
+/** @var \Mimmi20\Mezzio\Navigation\Page\Route $activeNavPage */
+/** @var \Mimmi20\Mezzio\Navigation\Navigation $navigation */
+$navigation = $this->service('DictionaryNavigation');
+$activeNavPage = $navigation->findOneBy('route', 'dictionary-rhyme');
+$activeNavPage->setActive(true);
+//$activeNavPage->setDefaultRouter($this->service('Router'));
+
+/** @var $word \App\Entity\Word */
+?>
+<div class="p-3 mb-4 bg-light rounded-3">
+    <?php if (!isset($word)): ?>
+        <h3>How to Rhyme Words</h3>
+        <p>The section <a href="<?= $this->url('dictionary-rhyme') ?>">Rhyme Search</a> will help you choose rhymes.
+        It is sure to appeal to both venerable wordsmiths and those who are taking the first steps in poetry.
+        If you are accustomed to talking about your feelings on the paper, you will find a lot of useful things on this page.</p>
+
+    <h3>Rhyme Features</h3>
+
+        <p>Nowadays poets are increasingly resorting to inexact rhyme and sometimes integral rhyme.
+        It is not always possible to find a word similar in sound as it should also preserve the sense of the poem.
+        In this case the site comes to your aid.</p>
+
+    <?php endif; ?>
+    <h3>How to Search for Rhymes</h3>
+
+    <p class="lead">You just need to enter the word you are <a href="<?=$this->url('dictionary-rhyme') ?>">looking for a rhyme</a> in the field.
+        In order to find a more original version you can resort to fuzzy search.
+    Practically in no time you will be provided with a list of rhyming words according to your request.
+    They will be presented in blocks depending on the number of letters.</p>
+
+
+    <form class="d-flex flex-wrap flex-sm-nowrap justify-content-start align-items-center" method="get" role="form" action="<?= $this->url('dictionary-rhyme-search') ?>">
+            <label class="sr-only" for="rhyme_input">Word</label>
+            <input type="text" name="query" value="<?= $query??'' ?>"
+                   class="form-control me-sm-2 mb-2 mb-sm-0" id="rhyme_input" placeholder="Word">
+
+        <div class="custom-control custom-checkbox custom-control-inline text-nowrap me-3">
+            <input class="custom-control-input" type="checkbox" id="fuzzy-checkbox" name="fuzzy" value="1" <?= (isset($fuzzy) && $fuzzy) ? 'checked' : '' ?>>
+            <label class="text-nowrap" for="fuzzy-checkbox">Fuzzy search </label>
+        </div>
+        <button type="submit" class="btn btn-primary text-nowrap">Find rhymes</button>
+    </form>
+
+</div>
+<?php
+if (isset($word) && isset($length)) {
+    $title = sprintf('%d letter words that rhyme with %s', $length, $word);
+    $this->headMeta()->setProperty('og:title', $title);
+    $activeNavPage->addPage(
+        new \Mimmi20\Mezzio\Navigation\Page\Route([
+            'label'         => sprintf($this->translate('words that rhyme with %s'), $word),
+            'route'         => 'dictionary-rhyme-term',
+            'params'        => array('term' => $word),
+            'active'        => true,
+            'pages'         => array(
+                array(
+                    'label'         => sprintf('%d letter', $length),
+                    'route'         => 'dictionary-rhyme-term',
+                    'params'        => array('term' => $word, 'length' => $length),
+                    'active'        => true,
+                )
+            )
+        ])
+    );
+} elseif (isset($word)) {
+    $title = sprintf($this->translate('Words that rhyme with %s'), $word);
+    $this->headMeta()->setProperty('og:title', $title);
+    $activeNavPage->addPage(
+        new \Mimmi20\Mezzio\Navigation\Page\Route([
+            'label'         => sprintf($this->translate('words that rhyme with %s'), $word),
+            'route'         => 'dictionary-rhyme-term',
+            'params'        => array('term' => $word),
+            'active'        => true,
+        ])
+    );
+} else {
+    $title = $this->translate('Search for rhymes');
+    $this->headMeta()->setProperty('og:title', $title);
+    $this->headTitle()->append('Rhymes');
+}
+
+$this->headTitle()->append($title);
+$this->headScript()->appendScript(
+    '{
+			"@context": "http://schema.org",
+			"@type": "WebSite",
+			"url": "' . $this->serverUrl('/') . '",
+			"potentialAction": {
+				"@type": "SearchAction",
+				"target": "' . $this->serverUrl('/rhyme/search') . '?query={query}",
+				"query-input": "required name=query",
+				"description" : "Search rhymes"
+			}
+		}',
+    'application/ld+json',
+    array('noescape' => true)
+);
+
+?>
+<div class="page-header">
+    <h1><?php echo $title ?></h1>
+</div>
+<article>
+    <?php
+    if (isset($strongRhymes) && $strongRhymes->count() > 0):
+        echo $this->partial(
+            'rhyme::list',
+            array(
+                'rhymes' => $strongRhymes,
+                'blockTitle' => sprintf($this->translate('Rhymes for word %s'), $word)
+            )
+        );
+    endif;
+
+    if (isset($rhymes) && $rhymes->count() > 0):
+        echo $this->partial(
+            'rhyme::list',
+            array(
+                'rhymes' => $rhymes,
+                'blockTitle' => sprintf($this->translate('Other possible rhymes for %s'), $word)
+            )
+        );
+    endif;
+
+    if (isset($word) && $word
+        && (isset($rhymes) && $rhymes->count() == 0)
+        && (isset($strongRhymes) && $strongRhymes->count() == 0)
+    ):?>
+        <div class="alert alert-danger">
+            <h3><?= $this->translate('Failure!') ?></h3>
+
+            <p><?= sprintf($this->translate('Unfortunately no rhymes could be found for'), sprintf('<strong>%s</strong>', $word)) ?></p>
+        </div>
+    <?php
+    endif;
+    ?>
+</article>
+
+
+<?php
+if (isset($paginator)){
+    echo $this->partial('dictionary::pager', [
+        'paginator' => $paginator
+    ]);
+}
+?>
+
+<?php if (isset($word)): ?>
+    <aside>
+        <div class="card bg-light">
+            <div class="card-body">
+                <?php
+                    $_wordStripped = preg_replace('~[^a-zA-Z]+~', '', $word);
+                    $chars = preg_split('~~u', $_wordStripped, -1, PREG_SPLIT_NO_EMPTY);
+                    ?>
+                    <?php
+                    $str = '';
+                    for ($i = 0; $i < min(count($chars) - 1, 5); $i++):
+                        $str .= $chars[$i];
+
+                        ?>
+                        <a href="<?=
+                        $this->url(
+                            'dictionary-contains',
+                            array(
+                                'chars'  => $str,
+                                'action' => 'starts'
+                            )
+                        ) ?>">words starting with "<?= $str ?>"</a>,
+                    <?php endfor ?>
+
+
+                    <?php
+                    $str = '';
+                    for ($i = count($chars)-1; $i > max(0, count($chars)-5); $i--):
+                        $str = $chars[$i] . $str;
+
+                        ?>
+                        <a href="<?=
+                        $this->url(
+                            'dictionary-contains',
+                            array(
+                                'chars'  => $str,
+                                'action' => 'ends'
+                            )
+                        ) ?>">words ending with "<?= $str ?>"</a>,
+                    <?php endfor ?>
+
+                    <?php
+                    $str = '';
+                    for ($i = 1; $i < min(count($chars) - 1, 5); $i++):
+                        $str .= $chars[$i];
+
+                        ?>
+                        <a href="<?=
+                        $this->url(
+                            'dictionary-contains',
+                            array(
+                                'chars'  => $str,
+                                'action' => 'contains'
+                            )
+                        ) ?>">words containing "<?= $str ?>"</a>,
+                    <?php endfor ?>
+
+            </div>
+        </div>
+    </aside>
+<?php endif; ?>
