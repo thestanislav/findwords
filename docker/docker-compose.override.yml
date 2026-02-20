@@ -5,7 +5,7 @@
 # Or put overrides in a .env file in the project root (add .env to .gitignore).
 # docker-compose merges override files automatically; environment overrides env_file.
 services:
-    mezzio-swoole-app:
+    findwords-swoole-app:
         environment:
             - APP_DEBUG=${APP_DEBUG:-1}
             - APP_ENV=${APP_ENV:-development}

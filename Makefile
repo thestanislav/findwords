@@ -7,7 +7,7 @@ _GID := $(shell id -g)
 export _UID
 export _GID
 
-export CI_SWOOLE_APP_IMAGE=mezzio-swoole-app-dev
+export CI_SWOOLE_APP_IMAGE=findwords-swoole-app-dev
 CI_ENVIRONMENT_NAME	?= dev
 export CI_ENVIRONMENT_NAME
 
@@ -47,20 +47,20 @@ restart:
 	@echo -e '\e[1;31mDone\e[0m'
 
 swoole-reload:
-	@docker exec mezzio-swoole-app php vendor/bin/laminas mezzio:swoole:reload
+	@docker exec findwords-swoole-app php vendor/bin/laminas mezzio:swoole:reload
 
 swoole-status:
-	@docker exec mezzio-swoole-app php vendor/bin/laminas mezzio:swoole:status
+	@docker exec findwords-swoole-app php vendor/bin/laminas mezzio:swoole:status
 
 # DB schema: run in container (CI or manual). schema-update applies entity changes.
 schema-update:
-	@docker exec mezzio-swoole-app php vendor/bin/mezzio-sf-console orm:schema-tool:update --force --dump-sql --complete
+	@docker exec findwords-swoole-app php vendor/bin/mezzio-sf-console orm:schema-tool:update --force --dump-sql --complete
 
 schema-create:
-	@docker exec mezzio-swoole-app php vendor/bin/mezzio-sf-console orm:schema-tool:create
+	@docker exec findwords-swoole-app php vendor/bin/mezzio-sf-console orm:schema-tool:create
 
 fixtures-load:
-	@docker exec mezzio-swoole-app php vendor/bin/mezzio-sf-console doctrine:fixtures:load --no-interaction
+	@docker exec findwords-swoole-app php vendor/bin/mezzio-sf-console doctrine:fixtures:load --no-interaction
 
 # Sync only the ExprAs packages that exist in packages/expras from /sites/expras.
 # Add or remove dirs in packages/expras to control which packages are copied.

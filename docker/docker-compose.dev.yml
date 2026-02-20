@@ -1,5 +1,5 @@
 services:
-    mezzio-swoole-app:
+    findwords-swoole-app:
         build:
             context: ../
             dockerfile: docker/php-app/Dockerfile
