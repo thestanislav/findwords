@@ -7,7 +7,11 @@ declare(strict_types=1);
  * Override via SWOOLE_HOST, SWOOLE_PORT env vars (see env-overrides.php).
  */
 
+use App\Swoole\EventDispatcherDelegatorFactory;
+use App\Swoole\RequestTimeoutListener;
+use App\Swoole\RequestTimeoutListenerFactory;
 use Laminas\Stdlib\ArrayUtils\MergeReplaceKey;
+use Mezzio\Swoole\Event\EventDispatcherInterface;
 use Mezzio\Swoole\Event\RequestEvent;
 use Mezzio\Swoole\Event\RequestHandlerRequestListener;
 use Mezzio\Swoole\Event\StaticResourceRequestListener;
@@ -17,12 +21,23 @@ return [
         'invokables' => [
             \Mezzio\Swoole\Log\StdoutLogger::class,
         ],
+        'factories' => [
+            RequestTimeoutListener::class => RequestTimeoutListenerFactory::class,
+        ],
+        'delegators' => [
+            EventDispatcherInterface::class => [
+                EventDispatcherDelegatorFactory::class,
+            ],
+        ],
     ],
     'mezzio-swoole' => [
         'enable_coroutine' => true,
+        // Max request execution time in ms (default 30000). Set to 0 to disable.
+        'request_timeout_ms' => 5000,
         'swoole-http-server' => [
             'listeners' => [
                 RequestEvent::class => new MergeReplaceKey([
+                    RequestTimeoutListener::class,
                     StaticResourceRequestListener::class,
                     RequestHandlerRequestListener::class,
                 ]),
@@ -42,6 +57,9 @@ return [
                 // Overwrite the default location of the pid file;
                 // required when you want to run multiple instances of your service in different ports:
                 'pid_file' => 'data/mezzio-swoole-expras.pid',
+                'reactor_num' => 8,
+                "max_coro_num" => 50,                 
+                "max_coroutine" => 50, 
             ],
             'static-files' => [
                 'enable'        => true,
